@@ -2,12 +2,17 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Play, Pause, Volume2, Download, Globe, Clock } from "lucide-react";
-import { useState } from "react";
+import { Play, Pause, Volume2, Download, Globe, Clock, SkipForward, SkipBack } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
 
 const BibliaAudio = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [idiomaAtual, setIdiomaAtual] = useState("português");
+  const [currentBook, setCurrentBook] = useState("João");
+  const [currentChapter, setCurrentChapter] = useState(3);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const idiomas = [
     { 
@@ -58,6 +63,88 @@ const BibliaAudio = () => {
     { nome: "Apocalipse", capitulos: 22, duracao: "1h 50min" }
   ];
 
+  // URLs de áudio da Bíblia baseadas na API do Bible.is
+  const getAudioUrl = (book: string, chapter: number, language: string) => {
+    const languageMap: { [key: string]: string } = {
+      português: "PORNTB",
+      english: "ENGESV",
+      español: "SPNBLV",
+      français: "FRNSBL",
+      deutsch: "DEULUT"
+    };
+    
+    const langCode = languageMap[language] || "PORNTB";
+    // Simulando URLs de áudio (na implementação real, use APIs como Bible.is)
+    return `https://audio.bible.is/${langCode}/${book}/${chapter}.mp3`;
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+  };
+
+  const handlePlayPause = () => {
+    if (!audioRef.current) {
+      // Para demonstração, usando um áudio de exemplo
+      audioRef.current = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav");
+      audioRef.current.addEventListener('loadedmetadata', () => {
+        setDuration(audioRef.current?.duration || 0);
+      });
+      audioRef.current.addEventListener('timeupdate', () => {
+        setCurrentTime(audioRef.current?.currentTime || 0);
+      });
+      audioRef.current.addEventListener('ended', () => {
+        setIsPlaying(false);
+      });
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error("Erro ao reproduzir áudio:", error);
+      });
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleBookChange = (bookName: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setCurrentBook(bookName);
+    setCurrentChapter(1);
+    setCurrentTime(0);
+  };
+
+  const handleNextChapter = () => {
+    const book = livrosPopulares.find(l => l.nome === currentBook);
+    if (book && currentChapter < book.capitulos) {
+      setCurrentChapter(currentChapter + 1);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  };
+
+  const handlePrevChapter = () => {
+    if (currentChapter > 1) {
+      setCurrentChapter(currentChapter - 1);
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current = null;
+      }
+      setIsPlaying(false);
+      setCurrentTime(0);
+    }
+  };
+
   const idiomaAtualInfo = idiomas.find(i => i.codigo === idiomaAtual);
 
   return (
@@ -77,21 +164,37 @@ const BibliaAudio = () => {
             Player de Áudio
           </CardTitle>
           <CardDescription>
-            Reproduzindo: João 3:16 em {idiomaAtualInfo?.nome}
+            Reproduzindo: {currentBook} {currentChapter} em {idiomaAtualInfo?.nome}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Button
+                size="sm"
+                variant="outline"
+                onClick={handlePrevChapter}
+                disabled={currentChapter <= 1}
+              >
+                <SkipBack className="w-4 h-4" />
+              </Button>
+              <Button
                 size="lg"
                 variant={isPlaying ? "secondary" : "divine"}
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlayPause}
               >
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={handleNextChapter}
+                disabled={currentChapter >= (livrosPopulares.find(l => l.nome === currentBook)?.capitulos || 1)}
+              >
+                <SkipForward className="w-4 h-4" />
+              </Button>
               <div>
-                <div className="font-semibold">João 3:16</div>
+                <div className="font-semibold">{currentBook} {currentChapter}</div>
                 <div className="text-sm text-muted-foreground">
                   {idiomaAtualInfo?.flag} {idiomaAtualInfo?.versao}
                 </div>
@@ -106,12 +209,15 @@ const BibliaAudio = () => {
           </div>
           
           <div className="w-full bg-background rounded-full h-2">
-            <div className="bg-primary h-2 rounded-full w-1/3"></div>
+            <div 
+              className="bg-primary h-2 rounded-full transition-all duration-300" 
+              style={{width: duration ? `${(currentTime / duration) * 100}%` : '0%'}}
+            ></div>
           </div>
           
           <div className="flex justify-between text-sm text-muted-foreground">
-            <span>1:23</span>
-            <span>3:45</span>
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
           </div>
         </CardContent>
       </Card>
@@ -166,7 +272,10 @@ const BibliaAudio = () => {
               {livrosPopulares.map((livro, idx) => (
                 <div 
                   key={idx} 
-                  className="p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer group"
+                  className={`p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer group ${
+                    currentBook === livro.nome ? 'border-primary bg-primary/10' : ''
+                  }`}
+                  onClick={() => handleBookChange(livro.nome)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold group-hover:text-primary transition-colors">

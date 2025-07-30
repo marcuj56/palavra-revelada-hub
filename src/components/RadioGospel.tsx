@@ -2,13 +2,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Radio, Play, Pause, Volume2, Heart, Music, Users, Globe } from "lucide-react";
-import { useState } from "react";
+import { useState, useRef } from "react";
 
 const RadioGospel = () => {
-  const [currentStation, setCurrentStation] = useState("Rádio Louvor");
+  const [currentStation, setCurrentStation] = useState("Rádio Vivendo Na Fé");
   const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const estacoes = [
+    {
+      nome: "Rádio Vivendo Na Fé",
+      descricao: "Música gospel e pregações 24h",
+      genero: "Gospel",
+      ouvintes: "15.2k",
+      pais: "🇧🇷",
+      url: "https://stream.zeno.fm/ug07t11zn0hvv"
+    },
     {
       nome: "Rádio Louvor",
       descricao: "Música gospel contemporânea 24h",
@@ -68,6 +77,31 @@ const RadioGospel = () => {
     { horario: "21:00", programa: "Adoração Noturna", apresentador: "Ministério Koinonia" }
   ];
 
+  const handlePlayPause = () => {
+    if (!audioRef.current) {
+      audioRef.current = new Audio(currentStationInfo?.url);
+      audioRef.current.crossOrigin = "anonymous";
+    }
+
+    if (isPlaying) {
+      audioRef.current.pause();
+    } else {
+      audioRef.current.play().catch(error => {
+        console.error("Erro ao reproduzir áudio:", error);
+      });
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleStationChange = (stationName: string) => {
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current = null;
+    }
+    setIsPlaying(false);
+    setCurrentStation(stationName);
+  };
+
   const getGeneroColor = (genero: string) => {
     switch (genero) {
       case "Contemporâneo": case "Contemporary": return "bg-blue-100 text-blue-800";
@@ -75,6 +109,7 @@ const RadioGospel = () => {
       case "Misto": return "bg-purple-100 text-purple-800";
       case "Latina": return "bg-green-100 text-green-800";
       case "Worship": return "bg-pink-100 text-pink-800";
+      case "Gospel": return "bg-emerald-100 text-emerald-800";
       default: return "bg-gray-100 text-gray-800";
     }
   };
@@ -104,7 +139,7 @@ const RadioGospel = () => {
               <Button
                 size="lg"
                 variant={isPlaying ? "secondary" : "outline"}
-                onClick={() => setIsPlaying(!isPlaying)}
+                onClick={handlePlayPause}
                 className="bg-pure-white text-heaven-blue hover:bg-gray-100"
               >
                 {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
@@ -157,7 +192,7 @@ const RadioGospel = () => {
                       ? 'border-primary bg-primary/10' 
                       : 'hover:bg-accent'
                   }`}
-                  onClick={() => setCurrentStation(estacao.nome)}
+                  onClick={() => handleStationChange(estacao.nome)}
                 >
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
