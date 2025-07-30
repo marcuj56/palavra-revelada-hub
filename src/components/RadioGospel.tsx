@@ -1,22 +1,28 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Radio, Play, Pause, Volume2, Heart, Music, Users, Globe } from "lucide-react";
-import { useState, useRef } from "react";
+import { Radio, Play, Pause, Volume2, Heart, Music, Users, Globe, Crown, MapPin } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import LiveComments from "./LiveComments";
+import LivePolls from "./LivePolls";
+import PrayerRequests from "./PrayerRequests";
+import SongRequests from "./SongRequests";
 
 const RadioGospel = () => {
   const [currentStation, setCurrentStation] = useState("Rádio Vivendo Na Fé");
   const [isPlaying, setIsPlaying] = useState(false);
+  const [currentSong, setCurrentSong] = useState("Águas Profundas - Ministério Vem com Josué");
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
   const estacoes = [
     {
       nome: "Rádio Vivendo Na Fé",
-      descricao: "Música gospel e pregações 24h",
+      descricao: "Rádio cristã de Portugal - Música gospel e pregações 24h",
       genero: "Gospel",
-      ouvintes: "15.2k",
-      pais: "🇧🇷",
-      url: "https://stream.zeno.fm/ug07t11zn0hvv"
+      ouvintes: "25.8k",
+      pais: "🇵🇹",
+      url: "https://stream.zeno.fm/ug07t11zn0hvv",
+      fundador: "Mário Bernardo"
     },
     {
       nome: "Rádio Louvor",
@@ -72,10 +78,30 @@ const RadioGospel = () => {
     { horario: "06:00", programa: "Café com Deus", apresentador: "Pastor João" },
     { horario: "09:00", programa: "Louvores da Manhã", apresentador: "Maria Santos" },
     { horario: "12:00", programa: "Palavra do Meio-Dia", apresentador: "Pr. Carlos" },
-    { horario: "15:00", programa: "Tarde Abençoada", apresentador: "Ana Paula" },
-    { horario: "18:00", programa: "Hora da Família", apresentador: "Família Lima" },
+    { horario: "15:00", programa: "Debate", apresentador: "Mário Bernardo" },
+    { horario: "18:00", programa: "Crescendo na Fé", apresentador: "Família Lima" },
     { horario: "21:00", programa: "Adoração Noturna", apresentador: "Ministério Koinonia" }
   ];
+
+  // Simulação de mudança de música
+  useEffect(() => {
+    const songs = [
+      "Águas Profundas - Ministério Vem com Josué",
+      "Quão Grande é o Meu Deus - Hillsong United",
+      "Reckless Love - Cory Asbury",
+      "Tu És Santo - Ministério Vem com Josué",
+      "Oceans - Hillsong United",
+      "Great Are You Lord - All Sons & Daughters"
+    ];
+    
+    const interval = setInterval(() => {
+      if (isPlaying) {
+        setCurrentSong(songs[Math.floor(Math.random() * songs.length)]);
+      }
+    }, 15000); // Muda a cada 15 segundos
+
+    return () => clearInterval(interval);
+  }, [isPlaying]);
 
   const handlePlayPause = () => {
     if (!audioRef.current) {
@@ -117,55 +143,76 @@ const RadioGospel = () => {
   const currentStationInfo = estacoes.find(e => e.nome === currentStation);
 
   return (
-    <section className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold text-foreground mb-2">Rádio Gospel 24h</h2>
-        <p className="text-muted-foreground">
-          Ouça músicas cristãs de todo o mundo enquanto estuda a Palavra
+    <section className="space-y-8">
+      {/* Cabeçalho da Rádio */}
+      <div className="text-center space-y-4">
+        <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-radio-primary to-radio-accent rounded-full text-white">
+          <Crown className="w-6 h-6" />
+          <h2 className="text-3xl font-bold">Rádio Vivendo Na Fé</h2>
+          <Crown className="w-6 h-6" />
+        </div>
+        <p className="text-muted-foreground text-lg">
+          Rádio Cristã de Portugal - Fundada por Mário Bernardo
         </p>
+        <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+          <MapPin className="w-4 h-4" />
+          <span>Portugal • Ouvintes de todo o mundo</span>
+        </div>
       </div>
 
       {/* Player Principal */}
-      <Card className="bg-gradient-to-r from-heaven-blue to-golden-light text-pure-white">
+      <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-pure-white">
-            <Radio className="w-6 h-6" />
-            Agora Tocando
+          <CardTitle className="flex items-center gap-2 text-white text-2xl">
+            <Radio className="w-8 h-8" />
+            AO VIVO - Rádio Vivendo Na Fé
+            {isPlaying && (
+              <Badge className="bg-live-green text-white animate-pulse">
+                <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
+                LIVE
+              </Badge>
+            )}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-6">
               <Button
                 size="lg"
-                variant={isPlaying ? "secondary" : "outline"}
+                variant="outline"
                 onClick={handlePlayPause}
-                className="bg-pure-white text-heaven-blue hover:bg-gray-100"
+                className="bg-white text-radio-primary hover:bg-gray-100 border-white h-16 w-16 rounded-full shadow-lg"
               >
-                {isPlaying ? <Pause className="w-6 h-6" /> : <Play className="w-6 h-6" />}
+                {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               </Button>
-              <div>
-                <div className="text-lg font-bold">{currentStation}</div>
-                <div className="text-sm opacity-90">
+              <div className="space-y-2">
+                <div className="text-2xl font-bold">{currentStation}</div>
+                <div className="text-lg opacity-90">
                   {currentStationInfo?.descricao}
                 </div>
               </div>
             </div>
-            <div className="text-right">
-              <div className="flex items-center gap-2 text-sm">
-                <Users className="w-4 h-4" />
-                <span>{currentStationInfo?.ouvintes} ouvindo</span>
+            <div className="text-right space-y-2">
+              <div className="flex items-center gap-2 text-lg">
+                <Users className="w-5 h-5" />
+                <span className="font-bold">{currentStationInfo?.ouvintes}</span>
+                <span>ouvindo agora</span>
               </div>
-              <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2">
                 <Globe className="w-4 h-4" />
-                <span>{currentStationInfo?.pais}</span>
+                <span>{currentStationInfo?.pais} Portugal</span>
               </div>
             </div>
           </div>
           
-          <div className="flex items-center gap-2">
-            <Music className="w-4 h-4" />
-            <span className="text-sm">Tocando agora: "Quão Grande é o Meu Deus" - Hillsong</span>
+          <div className="bg-white/20 rounded-lg p-4">
+            <div className="flex items-center gap-3 mb-2">
+              <Music className="w-5 h-5" />
+              <span className="font-semibold">Tocando Agora:</span>
+            </div>
+            <div className="text-xl font-bold animate-pulse">
+              "{currentSong}"
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -256,24 +303,43 @@ const RadioGospel = () => {
         </Card>
       </div>
 
-      {/* Radio Embed */}
-      <Card>
+      {/* Sistemas Interativos em Tempo Real */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <LivePolls />
+        <LiveComments />
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <PrayerRequests />
+        <SongRequests />
+      </div>
+
+      {/* Player Integrado */}
+      <Card className="bg-gradient-to-br from-white via-purple-50 to-blue-50">
         <CardHeader>
-          <CardTitle>Player Integrado</CardTitle>
+          <CardTitle className="text-primary">Player Integrado - Rádio Vivendo Na Fé</CardTitle>
           <CardDescription>
-            Player direto da estação selecionada
+            Stream direto de Portugal • Fundada por Mário Bernardo
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="aspect-video w-full bg-muted rounded-lg flex items-center justify-center">
-            <div className="text-center space-y-2">
-              <Radio className="w-12 h-12 mx-auto text-muted-foreground" />
-              <p className="text-sm text-muted-foreground">
-                Player de rádio estaria incorporado aqui
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Estação: {currentStation}
-              </p>
+          <div className="aspect-video w-full bg-gradient-to-br from-radio-primary/10 to-radio-accent/10 rounded-lg flex items-center justify-center border-2 border-radio-primary/20">
+            <div className="text-center space-y-4">
+              <Radio className="w-16 h-16 mx-auto text-radio-primary animate-pulse" />
+              <div>
+                <p className="text-lg font-semibold text-radio-primary">
+                  {isPlaying ? "Transmitindo ao Vivo" : "Player Integrado"}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Rádio Vivendo Na Fé • Portugal
+                </p>
+              </div>
+              {isPlaying && (
+                <Badge className="bg-live-green text-white">
+                  <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                  AO VIVO
+                </Badge>
+              )}
             </div>
           </div>
         </CardContent>

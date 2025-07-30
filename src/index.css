@@ -17,16 +17,16 @@ All colors MUST be HSL.
     --popover: 0 0% 100%;
     --popover-foreground: 220 10% 15%;
 
-    --primary: 210 85% 45%;
+    --primary: 260 85% 65%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 46 90% 92%;
+    --secondary: 45 95% 80%;
     --secondary-foreground: 220 10% 25%;
 
-    --muted: 46 50% 95%;
+    --muted: 220 15% 95%;
     --muted-foreground: 220 10% 55%;
 
-    --accent: 45 100% 85%;
+    --accent: 200 90% 75%;
     --accent-foreground: 220 10% 25%;
 
     --destructive: 0 84.2% 60.2%;
@@ -36,13 +36,20 @@ All colors MUST be HSL.
     --input: 220 13% 91%;
     --ring: 210 85% 45%;
 
-    /* Design tokens específicos para página cristã */
-    --heaven-blue: 210 85% 45%;
-    --heaven-light: 210 70% 85%;
-    --golden-light: 45 100% 75%;
+    /* Design tokens específicos para rádio cristã portuguesa */
+    --radio-primary: 260 85% 65%;
+    --radio-secondary: 45 95% 80%;
+    --radio-accent: 200 90% 75%;
+    --heaven-blue: 220 80% 65%;
+    --heaven-light: 220 50% 90%;
+    --golden-light: 45 100% 80%;
     --pure-white: 0 0% 100%;
-    --holy-gradient: linear-gradient(135deg, hsl(var(--heaven-blue)), hsl(var(--golden-light)));
-    --divine-glow: 0 8px 32px hsl(var(--heaven-blue) / 0.2);
+    --live-green: 140 80% 55%;
+    --prayer-blue: 200 90% 70%;
+    --portugal-gold: 45 95% 65%;
+    --holy-gradient: linear-gradient(135deg, hsl(var(--radio-primary)), hsl(var(--radio-secondary)));
+    --radio-gradient: linear-gradient(135deg, hsl(var(--radio-primary)), hsl(var(--radio-accent)));
+    --divine-glow: 0 8px 32px hsl(var(--radio-primary) / 0.3);
     --sacred-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
     --radius: 0.5rem;

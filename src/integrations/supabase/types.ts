@@ -14,7 +14,137 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      poll_votes: {
+        Row: {
+          created_at: string
+          id: string
+          poll_id: string
+          selected_option: string
+          user_ip: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          poll_id: string
+          selected_option: string
+          user_ip: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          poll_id?: string
+          selected_option?: string
+          user_ip?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "poll_votes_poll_id_fkey"
+            columns: ["poll_id"]
+            isOneToOne: false
+            referencedRelation: "polls"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      polls: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          options: string[]
+          question: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          options: string[]
+          question: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          options?: string[]
+          question?: string
+        }
+        Relationships: []
+      }
+      prayer_requests: {
+        Row: {
+          created_at: string
+          id: string
+          is_anonymous: boolean | null
+          prayer_request: string
+          user_name: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          prayer_request: string
+          user_name: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_anonymous?: boolean | null
+          prayer_request?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      radio_comments: {
+        Row: {
+          comment: string
+          comment_type: string
+          created_at: string
+          id: string
+          user_name: string
+        }
+        Insert: {
+          comment: string
+          comment_type: string
+          created_at?: string
+          id?: string
+          user_name: string
+        }
+        Update: {
+          comment?: string
+          comment_type?: string
+          created_at?: string
+          id?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
+      song_requests: {
+        Row: {
+          artist: string | null
+          created_at: string
+          id: string
+          message: string | null
+          song_title: string
+          user_name: string
+        }
+        Insert: {
+          artist?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          song_title: string
+          user_name: string
+        }
+        Update: {
+          artist?: string | null
+          created_at?: string
+          id?: string
+          message?: string | null
+          song_title?: string
+          user_name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
