@@ -18,6 +18,8 @@ const buttonVariants = cva(
           "bg-secondary text-secondary-foreground hover:bg-secondary/80",
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
+        divine: "bg-gradient-to-r from-heaven-blue to-golden-light text-pure-white hover:shadow-lg hover:scale-105 transition-all duration-300",
+        sacred: "bg-heaven-light text-heaven-blue border border-heaven-blue hover:bg-heaven-blue hover:text-pure-white",
       },
       size: {
         default: "h-10 px-4 py-2",
