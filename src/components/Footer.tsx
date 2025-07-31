@@ -1,10 +1,8 @@
 import { Heart, Mail, Phone, MapPin, Facebook, Instagram, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
 const Footer = () => {
-  return (
-    <footer className="bg-gradient-to-r from-foreground to-primary text-primary-foreground mt-16">
-      <div className="container mx-auto px-4 py-12">
+  return <footer className="bg-gradient-to-r from-foreground to-primary text-primary-foreground mt-16">
+      <div className="container mx-auto px-4 py-12 bg-green-600">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Sobre */}
           <div className="space-y-4">
@@ -14,7 +12,7 @@ const Footer = () => {
               para crescimento espiritual e edificação da Igreja.
             </p>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="p-2">
+              <Button size="sm" variant="outline" className="p-2 text-zinc-950">
                 <Facebook className="w-4 h-4" />
               </Button>
               <Button size="sm" variant="outline" className="p-2">
@@ -82,8 +80,6 @@ const Footer = () => {
           </p>
         </div>
       </div>
-    </footer>
-  );
+    </footer>;
 };
-
 export default Footer;
