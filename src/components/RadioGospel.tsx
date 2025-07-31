@@ -160,12 +160,12 @@ const RadioGospel = () => {
       </div>
 
       {/* Player Principal */}
-      <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl">
+      <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl bg-indigo-50">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl text-amber-500">
             <Radio className="w-8 h-8" />
             AO VIVO - Rádio Vivendo Na Fé
-            {isPlaying && <Badge className="bg-live-green text-white animate-pulse">
+            {isPlaying && <Badge className="bg-live-green text-white animate-pulse bg-red-600">
                 <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
                 LIVE
               </Badge>}
@@ -294,9 +294,9 @@ const RadioGospel = () => {
 
       {/* Player Integrado */}
       <Card className="bg-gradient-to-br from-white via-purple-50 to-blue-50">
-        <CardHeader>
-          <CardTitle className="text-primary">Player Integrado - Rádio Vivendo Na Fé</CardTitle>
-          <CardDescription>
+        <CardHeader className="bg-green-600">
+          <CardTitle className="text-zinc-100">Player Integrado - Rádio Vivendo Na Fé</CardTitle>
+          <CardDescription className="text-zinc-50">
             Stream direto de Portugal • Fundada por Mário Bernardo
           </CardDescription>
         </CardHeader>
