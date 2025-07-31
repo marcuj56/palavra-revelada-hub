@@ -161,7 +161,7 @@ const RadioGospel = () => {
 
       {/* Player Principal */}
       <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl bg-indigo-50">
-        <CardHeader>
+        <CardHeader className="bg-zinc-600">
           <CardTitle className="flex items-center gap-2 text-2xl text-amber-500">
             <Radio className="w-8 h-8" />
             AO VIVO - Rádio Vivendo Na Fé
