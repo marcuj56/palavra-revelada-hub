@@ -52,10 +52,16 @@ export default {
 					DEFAULT: 'hsl(var(--card))',
 					foreground: 'hsl(var(--card-foreground))'
 				},
-				'heaven-blue': 'hsl(var(--heaven-blue))',
-				'heaven-light': 'hsl(var(--heaven-light))',
-				'golden-light': 'hsl(var(--golden-light))',
-				'pure-white': 'hsl(var(--pure-white))',
+				// CORES TEMÁTICAS CRISTÃS
+				'spiritual-blue': 'hsl(var(--spiritual-blue))',
+				'celestial-gold': 'hsl(var(--celestial-gold))',
+				'divine-green': 'hsl(var(--divine-green))',
+				'sacred-purple': 'hsl(var(--sacred-purple))',
+				'pure-light': 'hsl(var(--pure-light))',
+				'holy-white': 'hsl(var(--holy-white))',
+				'live-indicator': 'hsl(var(--live-indicator))',
+				'prayer-highlight': 'hsl(var(--prayer-highlight))',
+				'worship-glow': 'hsl(var(--worship-glow))',
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',
 					foreground: 'hsl(var(--sidebar-foreground))',
