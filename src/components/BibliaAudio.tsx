@@ -4,7 +4,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Play, Pause, Volume2, Download, Globe, Clock, SkipForward, SkipBack } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
-
 const BibliaAudio = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [idiomaAtual, setIdiomaAtual] = useState("português");
@@ -13,77 +12,91 @@ const BibliaAudio = () => {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  const idiomas = [
-    { 
-      codigo: "português", 
-      nome: "Português", 
-      flag: "🇧🇷", 
-      versao: "Nova Almeida Atualizada",
-      narrador: "João Silva"
-    },
-    { 
-      codigo: "english", 
-      nome: "English", 
-      flag: "🇺🇸", 
-      versao: "NIV",
-      narrador: "David Johnson"
-    },
-    { 
-      codigo: "español", 
-      nome: "Español", 
-      flag: "🇪🇸", 
-      versao: "Reina Valera 1960",
-      narrador: "Carlos García"
-    },
-    { 
-      codigo: "français", 
-      nome: "Français", 
-      flag: "🇫🇷", 
-      versao: "Louis Segond",
-      narrador: "Marie Dubois"
-    },
-    { 
-      codigo: "deutsch", 
-      nome: "Deutsch", 
-      flag: "🇩🇪", 
-      versao: "Luther Bibel",
-      narrador: "Hans Weber"
-    }
-  ];
-
-  const livrosPopulares = [
-    { nome: "Gênesis", capitulos: 50, duracao: "3h 20min" },
-    { nome: "Salmos", capitulos: 150, duracao: "4h 15min" },
-    { nome: "Provérbios", capitulos: 31, duracao: "1h 45min" },
-    { nome: "Mateus", capitulos: 28, duracao: "2h 30min" },
-    { nome: "João", capitulos: 21, duracao: "2h 10min" },
-    { nome: "Romanos", capitulos: 16, duracao: "1h 20min" },
-    { nome: "1 Coríntios", capitulos: 16, duracao: "1h 25min" },
-    { nome: "Apocalipse", capitulos: 22, duracao: "1h 50min" }
-  ];
+  const idiomas = [{
+    codigo: "português",
+    nome: "Português",
+    flag: "🇧🇷",
+    versao: "Nova Almeida Atualizada",
+    narrador: "João Silva"
+  }, {
+    codigo: "english",
+    nome: "English",
+    flag: "🇺🇸",
+    versao: "NIV",
+    narrador: "David Johnson"
+  }, {
+    codigo: "español",
+    nome: "Español",
+    flag: "🇪🇸",
+    versao: "Reina Valera 1960",
+    narrador: "Carlos García"
+  }, {
+    codigo: "français",
+    nome: "Français",
+    flag: "🇫🇷",
+    versao: "Louis Segond",
+    narrador: "Marie Dubois"
+  }, {
+    codigo: "deutsch",
+    nome: "Deutsch",
+    flag: "🇩🇪",
+    versao: "Luther Bibel",
+    narrador: "Hans Weber"
+  }];
+  const livrosPopulares = [{
+    nome: "Gênesis",
+    capitulos: 50,
+    duracao: "3h 20min"
+  }, {
+    nome: "Salmos",
+    capitulos: 150,
+    duracao: "4h 15min"
+  }, {
+    nome: "Provérbios",
+    capitulos: 31,
+    duracao: "1h 45min"
+  }, {
+    nome: "Mateus",
+    capitulos: 28,
+    duracao: "2h 30min"
+  }, {
+    nome: "João",
+    capitulos: 21,
+    duracao: "2h 10min"
+  }, {
+    nome: "Romanos",
+    capitulos: 16,
+    duracao: "1h 20min"
+  }, {
+    nome: "1 Coríntios",
+    capitulos: 16,
+    duracao: "1h 25min"
+  }, {
+    nome: "Apocalipse",
+    capitulos: 22,
+    duracao: "1h 50min"
+  }];
 
   // URLs de áudio da Bíblia baseadas na API do Bible.is
   const getAudioUrl = (book: string, chapter: number, language: string) => {
-    const languageMap: { [key: string]: string } = {
+    const languageMap: {
+      [key: string]: string;
+    } = {
       português: "PORNTB",
       english: "ENGESV",
       español: "SPNBLV",
       français: "FRNSBL",
       deutsch: "DEULUT"
     };
-    
     const langCode = languageMap[language] || "PORNTB";
     // Simulando URLs de áudio (na implementação real, use APIs como Bible.is)
     return `https://audio.bible.is/${langCode}/${book}/${chapter}.mp3`;
   };
-
   const formatTime = (time: number) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
-
   const handlePlayPause = () => {
     if (!audioRef.current) {
       // Para demonstração, usando um áudio de exemplo
@@ -98,7 +111,6 @@ const BibliaAudio = () => {
         setIsPlaying(false);
       });
     }
-
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -108,7 +120,6 @@ const BibliaAudio = () => {
     }
     setIsPlaying(!isPlaying);
   };
-
   const handleBookChange = (bookName: string) => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -119,7 +130,6 @@ const BibliaAudio = () => {
     setCurrentChapter(1);
     setCurrentTime(0);
   };
-
   const handleNextChapter = () => {
     const book = livrosPopulares.find(l => l.nome === currentBook);
     if (book && currentChapter < book.capitulos) {
@@ -132,7 +142,6 @@ const BibliaAudio = () => {
       setCurrentTime(0);
     }
   };
-
   const handlePrevChapter = () => {
     if (currentChapter > 1) {
       setCurrentChapter(currentChapter - 1);
@@ -144,11 +153,8 @@ const BibliaAudio = () => {
       setCurrentTime(0);
     }
   };
-
   const idiomaAtualInfo = idiomas.find(i => i.codigo === idiomaAtual);
-
-  return (
-    <section className="space-y-6">
+  return <section className="space-y-6">
       <div className="text-center">
         <h2 className="text-3xl font-bold text-foreground mb-2">Bíblia em Áudio</h2>
         <p className="text-muted-foreground">
@@ -167,30 +173,16 @@ const BibliaAudio = () => {
             Reproduzindo: {currentBook} {currentChapter} em {idiomaAtualInfo?.nome}
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-4 bg-green-500">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handlePrevChapter}
-                disabled={currentChapter <= 1}
-              >
+              <Button size="sm" variant="outline" onClick={handlePrevChapter} disabled={currentChapter <= 1}>
                 <SkipBack className="w-4 h-4" />
               </Button>
-              <Button
-                size="lg"
-                variant={isPlaying ? "secondary" : "divine"}
-                onClick={handlePlayPause}
-              >
+              <Button size="lg" variant={isPlaying ? "secondary" : "divine"} onClick={handlePlayPause}>
                 {isPlaying ? <Pause className="w-5 h-5" /> : <Play className="w-5 h-5" />}
               </Button>
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleNextChapter}
-                disabled={currentChapter >= (livrosPopulares.find(l => l.nome === currentBook)?.capitulos || 1)}
-              >
+              <Button size="sm" variant="outline" onClick={handleNextChapter} disabled={currentChapter >= (livrosPopulares.find(l => l.nome === currentBook)?.capitulos || 1)} className="text-zinc-700 bg-gray-200 hover:bg-gray-100">
                 <SkipForward className="w-4 h-4" />
               </Button>
               <div>
@@ -209,10 +201,9 @@ const BibliaAudio = () => {
           </div>
           
           <div className="w-full bg-background rounded-full h-2">
-            <div 
-              className="bg-primary h-2 rounded-full transition-all duration-300" 
-              style={{width: duration ? `${(currentTime / duration) * 100}%` : '0%'}}
-            ></div>
+            <div style={{
+            width: duration ? `${currentTime / duration * 100}%` : '0%'
+          }} className="h-2 rounded-full transition-all duration-300 bg-zinc-200"></div>
           </div>
           
           <div className="flex justify-between text-sm text-muted-foreground">
@@ -237,25 +228,21 @@ const BibliaAudio = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {idiomas.map((idioma) => (
-                  <SelectItem key={idioma.codigo} value={idioma.codigo}>
+                {idiomas.map(idioma => <SelectItem key={idioma.codigo} value={idioma.codigo}>
                     <div className="flex items-center gap-2">
                       <span>{idioma.flag}</span>
                       <span>{idioma.nome}</span>
                     </div>
-                  </SelectItem>
-                ))}
+                  </SelectItem>)}
               </SelectContent>
             </Select>
             
-            {idiomaAtualInfo && (
-              <div className="mt-4 p-3 bg-muted rounded-lg">
+            {idiomaAtualInfo && <div className="mt-4 p-3 bg-muted rounded-lg">
                 <div className="text-sm font-medium">Versão: {idiomaAtualInfo.versao}</div>
                 <div className="text-sm text-muted-foreground">
                   Narrado por: {idiomaAtualInfo.narrador}
                 </div>
-              </div>
-            )}
+              </div>}
           </CardContent>
         </Card>
 
@@ -269,14 +256,7 @@ const BibliaAudio = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {livrosPopulares.map((livro, idx) => (
-                <div 
-                  key={idx} 
-                  className={`p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer group ${
-                    currentBook === livro.nome ? 'border-primary bg-primary/10' : ''
-                  }`}
-                  onClick={() => handleBookChange(livro.nome)}
-                >
+              {livrosPopulares.map((livro, idx) => <div key={idx} className={`p-3 border rounded-lg hover:bg-accent transition-colors cursor-pointer group ${currentBook === livro.nome ? 'border-primary bg-primary/10' : ''}`} onClick={() => handleBookChange(livro.nome)}>
                   <div className="flex justify-between items-start mb-2">
                     <h4 className="font-semibold group-hover:text-primary transition-colors">
                       {livro.nome}
@@ -289,8 +269,7 @@ const BibliaAudio = () => {
                     <Clock className="w-3 h-3" />
                     <span>{livro.duracao}</span>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -324,8 +303,6 @@ const BibliaAudio = () => {
           </div>
         </CardContent>
       </Card>
-    </section>
-  );
+    </section>;
 };
-
 export default BibliaAudio;
