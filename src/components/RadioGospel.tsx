@@ -174,7 +174,7 @@ const RadioGospel = () => {
         <CardContent className="space-y-6 bg-green-600">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <Button size="lg" variant="outline" onClick={handlePlayPause} className="text-radio-primary border-white h-16 w-16 rounded-full shadow-lg text-gray-950 bg-emerald-950 hover:bg-emerald-800">
+              <Button size="lg" variant="outline" onClick={handlePlayPause} className="text-radio-primary border-white h-16 w-16 rounded-full shadow-lg text-red-900 bg-amber-400 hover:bg-amber-300">
                 {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               </Button>
               <div className="space-y-2">
