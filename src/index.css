@@ -8,19 +8,19 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* PALETA PROFISSIONAL CRISTÃ */
+    /* PALETA PROFISSIONAL CRISTÃ RENOVADA */
     
-    /* Cor Primária: Azul Profundo - Para botões de destaque e cabeçalhos */
-    --primary: 220 85% 25%;
-    --primary-foreground: 0 0% 98%;
+    /* Cor Primária: Azul Céu Profundo - Para botões de destaque e cabeçalhos */
+    --primary: 210 100% 40%;
+    --primary-foreground: 0 0% 100%;
     
-    /* Cor Secundária: Dourado Celestial - Para fundos suaves */
-    --secondary: 45 65% 88%;
-    --secondary-foreground: 220 85% 25%;
+    /* Cor Secundária: Dourado Suave - Para fundos e destaques */
+    --secondary: 35 80% 92%;
+    --secondary-foreground: 210 100% 25%;
     
-    /* Cor de Apoio: Verde Oliva Suave - Para elementos interativos */
-    --accent: 85 35% 65%;
-    --accent-foreground: 220 85% 25%;
+    /* Cor de Apoio: Verde Esperança - Para elementos interativos */
+    --accent: 145 60% 50%;
+    --accent-foreground: 0 0% 100%;
     
     /* Fundo Principal: Marfim Claro - Para áreas de leitura */
     --background: 45 45% 98%;

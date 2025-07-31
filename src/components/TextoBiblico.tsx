@@ -2,13 +2,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Search, ExternalLink, BookOpen, MessageCircle } from "lucide-react";
+import { Search, ExternalLink, BookOpen, MessageCircle, Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const TextoBiblico = () => {
   const [versiculo, setVersiculo] = useState("Gênesis 1:1");
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
   
-  const textoAtual = {
+  const [textoAtual, setTextoAtual] = useState({
     referencia: "Gênesis 1:1",
     texto: "No princípio criou Deus os céus e a terra.",
     comentario: "Este versículo estabelece Deus como o Criador supremo de todas as coisas, apontando para sua soberania absoluta e poder criativo. A palavra 'princípio' (bereshit em hebraico) indica o início do tempo e do espaço físico.",
@@ -18,6 +21,42 @@ const TextoBiblico = () => {
       { ref: "Colossenses 1:16", texto: "Porque nele foram criadas todas as coisas..." },
       { ref: "Hebreus 11:3", texto: "Pela fé entendemos que os mundos foram criados..." }
     ]
+  });
+
+  const buscarVersiculo = async () => {
+    if (!versiculo.trim()) {
+      toast({ title: "Digite uma referência bíblica", variant: "destructive" });
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      // Simular busca real - aqui você pode integrar com uma API bíblica real
+      const response = await fetch(`https://www.abibliadigital.com.br/api/verses/acf/${encodeURIComponent(versiculo)}`);
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTextoAtual({
+          referencia: `${data.book.name} ${data.chapter}:${data.number}`,
+          texto: data.text,
+          comentario: "Este versículo contém importantes ensinamentos para nossa vida cristã. Medite profundamente em suas palavras.",
+          palavrasChave: [],
+          versiculosParalelos: []
+        });
+        toast({ title: "Versículo encontrado!", description: data.book.name });
+      } else {
+        throw new Error("Versículo não encontrado");
+      }
+    } catch (error) {
+      toast({ 
+        title: "Erro ao buscar versículo", 
+        description: "Verifique a referência e tente novamente",
+        variant: "destructive" 
+      });
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -45,9 +84,9 @@ const TextoBiblico = () => {
               onChange={(e) => setVersiculo(e.target.value)}
               className="flex-1"
             />
-            <Button variant="divine">
-              <Search className="w-4 h-4 mr-1" />
-              Buscar
+            <Button onClick={buscarVersiculo} disabled={loading}>
+              {loading ? <Loader2 className="w-4 h-4 mr-1 animate-spin" /> : <Search className="w-4 h-4 mr-1" />}
+              {loading ? "Buscando..." : "Buscar"}
             </Button>
           </div>
         </CardContent>

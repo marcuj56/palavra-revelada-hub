@@ -1,10 +1,30 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Download, Eye, Clock, Users } from "lucide-react";
 
 const EsbocosPregacao = () => {
-  const esbocos = [
+  const [esbocos, setEsbocos] = useState([]);
+
+  useEffect(() => {
+    const loadSermons = async () => {
+      const { data, error } = await supabase
+        .from('sermon_outlines')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+      
+      if (data) {
+        setEsbocos(data);
+      }
+    };
+
+    loadSermons();
+  }, []);
+
+  const esbocosDefault = [
     {
       titulo: "O Poder do Sangue de Jesus",
       tema: "Salvação",
@@ -99,49 +119,51 @@ const EsbocosPregacao = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {esbocos.map((esboço, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow">
+        {(esbocos.length > 0 ? esbocos : esbocosDefault).map((esboço, index) => (
+          <Card key={esboço.id || index} className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
-                <Badge variant="outline">{esboço.tema}</Badge>
-                <Badge className={getPublicoColor(esboço.publico)}>
-                  {esboço.publico}
+                <Badge variant="outline">{esboço.theme || esboço.tema}</Badge>
+                <Badge variant="secondary">
+                  {esboço.author || "Autor"}
                 </Badge>
               </div>
-              <CardTitle className="text-xl">{esboço.titulo}</CardTitle>
+              <CardTitle className="text-xl">{esboço.title || esboço.titulo}</CardTitle>
               <CardDescription className="italic">
-                "{esboço.versiculo}"
+                "{esboço.main_verse || esboço.versiculo}"
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 <div className="flex items-center gap-1">
-                  <Clock className="w-4 h-4" />
-                  <span>{esboço.duracao}</span>
-                </div>
-                <div className="flex items-center gap-1">
                   <Users className="w-4 h-4" />
-                  <span>{esboço.publico}</span>
+                  <span>{esboço.author || esboço.publico}</span>
                 </div>
               </div>
               
               <div className="space-y-2">
-                <h4 className="font-semibold text-sm">Estrutura:</h4>
-                <ul className="space-y-1">
-                  {esboço.pontos.map((ponto, idx) => (
-                    <li key={idx} className="text-sm text-muted-foreground ml-2">
-                      {ponto}
-                    </li>
-                  ))}
-                </ul>
+                <h4 className="font-semibold text-sm">Conteúdo:</h4>
+                <div className="text-sm text-muted-foreground">
+                  {esboço.content ? (
+                    <p className="line-clamp-3">{esboço.content}</p>
+                  ) : (
+                    <ul className="space-y-1">
+                      {esboço.pontos?.map((ponto, idx) => (
+                        <li key={idx} className="ml-2">
+                          {ponto}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" variant="divine" className="flex-1">
+                <Button size="sm" className="flex-1">
                   <Eye className="w-4 h-4 mr-1" />
                   Ver Completo
                 </Button>
-                <Button size="sm" variant="sacred">
+                <Button size="sm" variant="outline">
                   <Download className="w-4 h-4 mr-1" />
                   PDF
                 </Button>

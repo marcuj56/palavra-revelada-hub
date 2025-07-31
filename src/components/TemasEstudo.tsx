@@ -1,9 +1,29 @@
+import { useState, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Clock, Users, Star } from "lucide-react";
 
 const TemasEstudo = () => {
-  const temas = [
+  const [temas, setTemas] = useState([]);
+
+  useEffect(() => {
+    const loadThemes = async () => {
+      const { data, error } = await supabase
+        .from('study_themes')
+        .select('*')
+        .eq('is_published', true)
+        .order('created_at', { ascending: false });
+      
+      if (data) {
+        setTemas(data);
+      }
+    };
+
+    loadThemes();
+  }, []);
+
+  const temasDefault = [
     {
       titulo: "Pré-Tribulacionismo",
       descricao: "A vinda de Cristo antes da grande tribulação",
@@ -73,34 +93,35 @@ const TemasEstudo = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {temas.map((tema, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow cursor-pointer group">
+        {(temas.length > 0 ? temas : temasDefault).map((tema, index) => (
+          <Card key={tema.id || index} className="hover:shadow-lg transition-shadow cursor-pointer group">
             <CardHeader>
               <div className="flex justify-between items-start mb-2">
                 <Badge variant="outline" className="text-xs">
-                  {tema.categoria}
+                  Teologia
                 </Badge>
-                <Badge className={getNivelColor(tema.nivel)}>
-                  {tema.nivel}
+                <Badge className={getNivelColor(tema.difficulty_level || tema.nivel)}>
+                  {tema.difficulty_level || tema.nivel}
                 </Badge>
               </div>
               <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                {tema.titulo}
+                {tema.title || tema.titulo}
               </CardTitle>
               <CardDescription className="text-sm">
-                {tema.descricao}
+                {tema.description || tema.descricao}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
-                <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <Clock className="w-4 h-4" />
-                  <span>{tema.tempo}</span>
-                </div>
                 <div className="p-3 bg-muted rounded-lg">
-                  <p className="text-sm font-medium">Versículo base:</p>
-                  <p className="text-sm italic text-primary">{tema.versiculo}</p>
+                  <p className="text-sm font-medium">Referências bíblicas:</p>
+                  <p className="text-sm italic text-primary">{tema.bible_references || tema.versiculo}</p>
                 </div>
+                {tema.content && (
+                  <div className="text-xs text-muted-foreground">
+                    <p className="line-clamp-2">{tema.content.substring(0, 100)}...</p>
+                  </div>
+                )}
               </div>
             </CardContent>
           </Card>

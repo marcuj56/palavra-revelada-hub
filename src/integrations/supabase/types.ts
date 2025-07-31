@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_users: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          role: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          role?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          role?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       poll_votes: {
         Row: {
           created_at: string
@@ -118,6 +145,75 @@ export type Database = {
         }
         Relationships: []
       }
+      radio_schedule: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          presenter: string
+          program_name: string
+          time_slot: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          presenter: string
+          program_name: string
+          time_slot: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          presenter?: string
+          program_name?: string
+          time_slot?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      sermon_outlines: {
+        Row: {
+          author: string
+          content: string
+          created_at: string
+          id: string
+          is_published: boolean | null
+          main_verse: string
+          theme: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author: string
+          content: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          main_verse: string
+          theme: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author?: string
+          content?: string
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          main_verse?: string
+          theme?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       song_requests: {
         Row: {
           artist: string | null
@@ -142,6 +238,42 @@ export type Database = {
           message?: string | null
           song_title?: string
           user_name?: string
+        }
+        Relationships: []
+      }
+      study_themes: {
+        Row: {
+          bible_references: string
+          content: string
+          created_at: string
+          description: string
+          difficulty_level: string | null
+          id: string
+          is_published: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bible_references: string
+          content: string
+          created_at?: string
+          description: string
+          difficulty_level?: string | null
+          id?: string
+          is_published?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          bible_references?: string
+          content?: string
+          created_at?: string
+          description?: string
+          difficulty_level?: string | null
+          id?: string
+          is_published?: boolean | null
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
