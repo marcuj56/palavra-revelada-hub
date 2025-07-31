@@ -162,7 +162,7 @@ const RadioGospel = () => {
       {/* Player Principal */}
       <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl bg-indigo-50">
         <CardHeader className="bg-gray-700">
-          <CardTitle className="flex items-center gap-2 text-2xl text-amber-500">
+          <CardTitle className="flex items-center gap-2 text-2xl text-zinc-50">
             <Radio className="w-8 h-8" />
             AO VIVO - Rádio Vivendo Na Fé
             {isPlaying && <Badge className="bg-live-green text-white animate-pulse bg-red-600">
