@@ -144,11 +144,11 @@ const RadioGospel = () => {
   const currentStationInfo = estacoes.find(e => e.nome === currentStation);
   return <section className="space-y-8">
       {/* Cabeçalho da Rádio */}
-      <div className="text-center space-y-4">
+      <div className="text-center space-y-4 bg-zinc-100">
         <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-radio-primary to-radio-accent rounded-full text-white">
-          <Crown className="w-6 h-6" />
-          <h2 className="text-3xl font-bold">Rádio Vivendo Na Fé</h2>
-          <Crown className="w-6 h-6" />
+          <Crown className="w-6 h-6 bg-amber-500" />
+          <h2 className="text-3xl font-bold text-gray-700">Rádio Vivendo Na Fé</h2>
+          <Crown className="w-6 h-6 bg-amber-500" />
         </div>
         <p className="text-muted-foreground text-lg">
           Rádio Cristã de Portugal - Fundada por Mário Bernardo
