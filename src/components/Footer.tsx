@@ -12,13 +12,13 @@ const Footer = () => {
               para crescimento espiritual e edificação da Igreja.
             </p>
             <div className="flex gap-2">
-              <Button size="sm" variant="outline" className="p-2 text-zinc-950">
+              <Button size="sm" variant="outline" className="p-2 bg-green-800 hover:bg-green-700 text-zinc-50">
                 <Facebook className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" className="p-2">
+              <Button size="sm" variant="outline" className="p-2 text-base bg-green-800 hover:bg-green-700 text-zinc-50">
                 <Instagram className="w-4 h-4" />
               </Button>
-              <Button size="sm" variant="outline" className="p-2">
+              <Button size="sm" variant="outline" className="p-2 text-gray-200 bg-green-900 hover:bg-green-800">
                 <Youtube className="w-4 h-4" />
               </Button>
             </div>
