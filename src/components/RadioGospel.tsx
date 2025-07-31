@@ -228,7 +228,7 @@ const RadioGospel = () => {
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{estacao.pais}</span>
                       <h4 className="font-semibold">{estacao.nome}</h4>
-                      {currentStation === estacao.nome && isPlaying && <Badge variant="default" className="text-xs">
+                      {currentStation === estacao.nome && isPlaying && <Badge variant="default" className="text-xs bg-red-600">
                           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
                           AO VIVO
                         </Badge>}
