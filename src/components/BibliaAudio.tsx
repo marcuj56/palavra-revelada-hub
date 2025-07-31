@@ -176,7 +176,7 @@ const BibliaAudio = () => {
         <CardContent className="space-y-4 bg-green-500">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Button size="sm" variant="outline" onClick={handlePrevChapter} disabled={currentChapter <= 1}>
+              <Button size="sm" variant="outline" onClick={handlePrevChapter} disabled={currentChapter <= 1} className="text-gray-900 bg-gray-50">
                 <SkipBack className="w-4 h-4" />
               </Button>
               <Button size="lg" variant={isPlaying ? "secondary" : "divine"} onClick={handlePlayPause}>
