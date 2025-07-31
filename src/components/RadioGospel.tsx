@@ -7,93 +7,91 @@ import LiveComments from "./LiveComments";
 import LivePolls from "./LivePolls";
 import PrayerRequests from "./PrayerRequests";
 import SongRequests from "./SongRequests";
-
 const RadioGospel = () => {
   const [currentStation, setCurrentStation] = useState("Rádio Vivendo Na Fé");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState("Águas Profundas - Ministério Vem com Josué");
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  
-  const estacoes = [
-    {
-      nome: "Rádio Vivendo Na Fé",
-      descricao: "Rádio cristã de Portugal - Música gospel e pregações 24h",
-      genero: "Gospel",
-      ouvintes: "25.8k",
-      pais: "🇵🇹",
-      url: "https://stream.zeno.fm/ug07t11zn0hvv",
-      fundador: "Mário Bernardo"
-    },
-    {
-      nome: "Rádio Louvor",
-      descricao: "Música gospel contemporânea 24h",
-      genero: "Contemporâneo",
-      ouvintes: "12.5k",
-      pais: "🇧🇷",
-      url: "https://radiolouvor.com/stream"
-    },
-    {
-      nome: "Adoração FM",
-      descricao: "Hinos e louvores tradicionais",
-      genero: "Tradicional",
-      ouvintes: "8.2k",
-      pais: "🇧🇷",
-      url: "https://adoracaofm.com/stream"
-    },
-    {
-      nome: "Gospel Mix",
-      descricao: "O melhor do gospel nacional e internacional",
-      genero: "Misto",
-      ouvintes: "15.3k",
-      pais: "🇧🇷",
-      url: "https://gospelmix.com/stream"
-    },
-    {
-      nome: "Praise Radio",
-      descricao: "Contemporary Christian music",
-      genero: "Contemporary",
-      ouvintes: "22.1k",
-      pais: "🇺🇸",
-      url: "https://praiseradio.com/stream"
-    },
-    {
-      nome: "Adoración 24/7",
-      descricao: "Música cristiana en español",
-      genero: "Latina",
-      ouvintes: "9.7k",
-      pais: "🇪🇸",
-      url: "https://adoracion247.com/stream"
-    },
-    {
-      nome: "Worship FM",
-      descricao: "Hillsong, Bethel e mais",
-      genero: "Worship",
-      ouvintes: "18.9k",
-      pais: "🇬🇧",
-      url: "https://worshipfm.com/stream"
-    }
-  ];
-
-  const programacao = [
-    { horario: "06:00", programa: "Café com Deus", apresentador: "Pastor João" },
-    { horario: "09:00", programa: "Louvores da Manhã", apresentador: "Maria Santos" },
-    { horario: "12:00", programa: "Palavra do Meio-Dia", apresentador: "Pr. Carlos" },
-    { horario: "15:00", programa: "Debate", apresentador: "Mário Bernardo" },
-    { horario: "18:00", programa: "Crescendo na Fé", apresentador: "Família Lima" },
-    { horario: "21:00", programa: "Adoração Noturna", apresentador: "Ministério Koinonia" }
-  ];
+  const estacoes = [{
+    nome: "Rádio Vivendo Na Fé",
+    descricao: "Rádio cristã de Portugal - Música gospel e pregações 24h",
+    genero: "Gospel",
+    ouvintes: "25.8k",
+    pais: "🇵🇹",
+    url: "https://stream.zeno.fm/ug07t11zn0hvv",
+    fundador: "Mário Bernardo"
+  }, {
+    nome: "Rádio Louvor",
+    descricao: "Música gospel contemporânea 24h",
+    genero: "Contemporâneo",
+    ouvintes: "12.5k",
+    pais: "🇧🇷",
+    url: "https://radiolouvor.com/stream"
+  }, {
+    nome: "Adoração FM",
+    descricao: "Hinos e louvores tradicionais",
+    genero: "Tradicional",
+    ouvintes: "8.2k",
+    pais: "🇧🇷",
+    url: "https://adoracaofm.com/stream"
+  }, {
+    nome: "Gospel Mix",
+    descricao: "O melhor do gospel nacional e internacional",
+    genero: "Misto",
+    ouvintes: "15.3k",
+    pais: "🇧🇷",
+    url: "https://gospelmix.com/stream"
+  }, {
+    nome: "Praise Radio",
+    descricao: "Contemporary Christian music",
+    genero: "Contemporary",
+    ouvintes: "22.1k",
+    pais: "🇺🇸",
+    url: "https://praiseradio.com/stream"
+  }, {
+    nome: "Adoración 24/7",
+    descricao: "Música cristiana en español",
+    genero: "Latina",
+    ouvintes: "9.7k",
+    pais: "🇪🇸",
+    url: "https://adoracion247.com/stream"
+  }, {
+    nome: "Worship FM",
+    descricao: "Hillsong, Bethel e mais",
+    genero: "Worship",
+    ouvintes: "18.9k",
+    pais: "🇬🇧",
+    url: "https://worshipfm.com/stream"
+  }];
+  const programacao = [{
+    horario: "06:00",
+    programa: "Café com Deus",
+    apresentador: "Pastor João"
+  }, {
+    horario: "09:00",
+    programa: "Louvores da Manhã",
+    apresentador: "Maria Santos"
+  }, {
+    horario: "12:00",
+    programa: "Palavra do Meio-Dia",
+    apresentador: "Pr. Carlos"
+  }, {
+    horario: "15:00",
+    programa: "Debate",
+    apresentador: "Mário Bernardo"
+  }, {
+    horario: "18:00",
+    programa: "Crescendo na Fé",
+    apresentador: "Família Lima"
+  }, {
+    horario: "21:00",
+    programa: "Adoração Noturna",
+    apresentador: "Ministério Koinonia"
+  }];
 
   // Simulação de mudança de música
   useEffect(() => {
-    const songs = [
-      "Águas Profundas - Ministério Vem com Josué",
-      "Quão Grande é o Meu Deus - Hillsong United",
-      "Reckless Love - Cory Asbury",
-      "Tu És Santo - Ministério Vem com Josué",
-      "Oceans - Hillsong United",
-      "Great Are You Lord - All Sons & Daughters"
-    ];
-    
+    const songs = ["Águas Profundas - Ministério Vem com Josué", "Quão Grande é o Meu Deus - Hillsong United", "Reckless Love - Cory Asbury", "Tu És Santo - Ministério Vem com Josué", "Oceans - Hillsong United", "Great Are You Lord - All Sons & Daughters"];
     const interval = setInterval(() => {
       if (isPlaying) {
         setCurrentSong(songs[Math.floor(Math.random() * songs.length)]);
@@ -102,13 +100,11 @@ const RadioGospel = () => {
 
     return () => clearInterval(interval);
   }, [isPlaying]);
-
   const handlePlayPause = () => {
     if (!audioRef.current) {
       audioRef.current = new Audio(currentStationInfo?.url);
       audioRef.current.crossOrigin = "anonymous";
     }
-
     if (isPlaying) {
       audioRef.current.pause();
     } else {
@@ -118,7 +114,6 @@ const RadioGospel = () => {
     }
     setIsPlaying(!isPlaying);
   };
-
   const handleStationChange = (stationName: string) => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -127,23 +122,27 @@ const RadioGospel = () => {
     setIsPlaying(false);
     setCurrentStation(stationName);
   };
-
   const getGeneroColor = (genero: string) => {
     switch (genero) {
-      case "Contemporâneo": case "Contemporary": return "bg-blue-100 text-blue-800";
-      case "Tradicional": return "bg-amber-100 text-amber-800";
-      case "Misto": return "bg-purple-100 text-purple-800";
-      case "Latina": return "bg-green-100 text-green-800";
-      case "Worship": return "bg-pink-100 text-pink-800";
-      case "Gospel": return "bg-emerald-100 text-emerald-800";
-      default: return "bg-gray-100 text-gray-800";
+      case "Contemporâneo":
+      case "Contemporary":
+        return "bg-blue-100 text-blue-800";
+      case "Tradicional":
+        return "bg-amber-100 text-amber-800";
+      case "Misto":
+        return "bg-purple-100 text-purple-800";
+      case "Latina":
+        return "bg-green-100 text-green-800";
+      case "Worship":
+        return "bg-pink-100 text-pink-800";
+      case "Gospel":
+        return "bg-emerald-100 text-emerald-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
   };
-
   const currentStationInfo = estacoes.find(e => e.nome === currentStation);
-
-  return (
-    <section className="space-y-8">
+  return <section className="space-y-8">
       {/* Cabeçalho da Rádio */}
       <div className="text-center space-y-4">
         <div className="inline-flex items-center gap-3 px-6 py-3 bg-gradient-to-r from-radio-primary to-radio-accent rounded-full text-white">
@@ -163,26 +162,19 @@ const RadioGospel = () => {
       {/* Player Principal */}
       <Card className="bg-gradient-to-br from-radio-primary via-radio-accent to-radio-secondary text-white shadow-2xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-white text-2xl">
+          <CardTitle className="flex items-center gap-2 text-2xl text-amber-500">
             <Radio className="w-8 h-8" />
             AO VIVO - Rádio Vivendo Na Fé
-            {isPlaying && (
-              <Badge className="bg-live-green text-white animate-pulse">
+            {isPlaying && <Badge className="bg-live-green text-white animate-pulse">
                 <div className="w-2 h-2 bg-white rounded-full mr-2"></div>
                 LIVE
-              </Badge>
-            )}
+              </Badge>}
           </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 bg-green-600">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-6">
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={handlePlayPause}
-                className="bg-white text-radio-primary hover:bg-gray-100 border-white h-16 w-16 rounded-full shadow-lg"
-              >
+              <Button size="lg" variant="outline" onClick={handlePlayPause} className="bg-white text-radio-primary hover:bg-gray-100 border-white h-16 w-16 rounded-full shadow-lg">
                 {isPlaying ? <Pause className="w-8 h-8" /> : <Play className="w-8 h-8" />}
               </Button>
               <div className="space-y-2">
@@ -231,26 +223,15 @@ const RadioGospel = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {estacoes.map((estacao, idx) => (
-                <div 
-                  key={idx}
-                  className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${
-                    currentStation === estacao.nome 
-                      ? 'border-primary bg-primary/10' 
-                      : 'hover:bg-accent'
-                  }`}
-                  onClick={() => handleStationChange(estacao.nome)}
-                >
+              {estacoes.map((estacao, idx) => <div key={idx} className={`p-4 border rounded-lg cursor-pointer transition-all hover:shadow-md ${currentStation === estacao.nome ? 'border-primary bg-primary/10' : 'hover:bg-accent'}`} onClick={() => handleStationChange(estacao.nome)}>
                   <div className="flex justify-between items-start mb-2">
                     <div className="flex items-center gap-2">
                       <span className="text-lg">{estacao.pais}</span>
                       <h4 className="font-semibold">{estacao.nome}</h4>
-                      {currentStation === estacao.nome && isPlaying && (
-                        <Badge variant="default" className="text-xs">
+                      {currentStation === estacao.nome && isPlaying && <Badge variant="default" className="text-xs">
                           <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse mr-1"></div>
                           AO VIVO
-                        </Badge>
-                      )}
+                        </Badge>}
                     </div>
                     <Badge className={getGeneroColor(estacao.genero)}>
                       {estacao.genero}
@@ -269,8 +250,7 @@ const RadioGospel = () => {
                       <span>128 kbps</span>
                     </div>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -285,8 +265,7 @@ const RadioGospel = () => {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              {programacao.map((programa, idx) => (
-                <div key={idx} className="flex gap-3 p-2 rounded hover:bg-accent transition-colors">
+              {programacao.map((programa, idx) => <div key={idx} className="flex gap-3 p-2 rounded hover:bg-accent transition-colors">
                   <div className="text-sm font-mono bg-muted px-2 py-1 rounded text-center min-w-[50px]">
                     {programa.horario}
                   </div>
@@ -296,8 +275,7 @@ const RadioGospel = () => {
                       {programa.apresentador}
                     </div>
                   </div>
-                </div>
-              ))}
+                </div>)}
             </div>
           </CardContent>
         </Card>
@@ -334,18 +312,14 @@ const RadioGospel = () => {
                   Rádio Vivendo Na Fé • Portugal
                 </p>
               </div>
-              {isPlaying && (
-                <Badge className="bg-live-green text-white">
+              {isPlaying && <Badge className="bg-live-green text-white">
                   <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
                   AO VIVO
-                </Badge>
-              )}
+                </Badge>}
             </div>
           </div>
         </CardContent>
       </Card>
-    </section>
-  );
+    </section>;
 };
-
 export default RadioGospel;
