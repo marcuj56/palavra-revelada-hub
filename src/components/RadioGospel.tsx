@@ -302,7 +302,7 @@ const RadioGospel = () => {
         </CardHeader>
         <CardContent>
           <div className="aspect-video w-full bg-gradient-to-br from-radio-primary/10 to-radio-accent/10 rounded-lg flex items-center justify-center border-2 border-radio-primary/20">
-            <div className="text-center space-y-4">
+            <div className="text-center space-y-4 bg-transparent">
               <Radio className="w-16 h-16 mx-auto text-radio-primary animate-pulse" />
               <div>
                 <p className="text-lg font-semibold text-radio-primary">
