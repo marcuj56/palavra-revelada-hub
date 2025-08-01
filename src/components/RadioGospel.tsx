@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Radio, Play, Pause, Volume2, Heart, Music, Users, Globe, Crown, MapPin } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import LiveComments from "./LiveComments";
 import LivePolls from "./LivePolls";
 import PrayerRequests from "./PrayerRequests";
@@ -11,6 +12,7 @@ const RadioGospel = () => {
   const [currentStation, setCurrentStation] = useState("Rádio Vivendo Na Fé");
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentSong, setCurrentSong] = useState("Águas Profundas - Ministério Vem com Josué");
+  const [programacao, setProgramacao] = useState<any[]>([]);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const estacoes = [{
     nome: "Rádio Vivendo Na Fé",
@@ -63,31 +65,26 @@ const RadioGospel = () => {
     pais: "🇬🇧",
     url: "https://worshipfm.com/stream"
   }];
-  const programacao = [{
-    horario: "06:00",
-    programa: "Café com Deus",
-    apresentador: "Pastor João"
-  }, {
-    horario: "09:00",
-    programa: "Louvores da Manhã",
-    apresentador: "Maria Santos"
-  }, {
-    horario: "12:00",
-    programa: "Palavra do Meio-Dia",
-    apresentador: "Pr. Carlos"
-  }, {
-    horario: "15:00",
-    programa: "Debate",
-    apresentador: "Mário Bernardo"
-  }, {
-    horario: "18:00",
-    programa: "Crescendo na Fé",
-    apresentador: "Família Lima"
-  }, {
-    horario: "21:00",
-    programa: "Adoração Noturna",
-    apresentador: "Ministério Koinonia"
-  }];
+  // Carregar programação real da base de dados
+  useEffect(() => {
+    const loadProgramacao = async () => {
+      const { data, error } = await supabase
+        .from('radio_schedule')
+        .select('*')
+        .eq('is_active', true)
+        .order('time_slot');
+      
+      if (data && !error) {
+        setProgramacao(data.map(item => ({
+          horario: item.time_slot,
+          programa: item.program_name,
+          apresentador: item.presenter
+        })));
+      }
+    };
+    
+    loadProgramacao();
+  }, []);
 
   // Simulação de mudança de música
   useEffect(() => {
