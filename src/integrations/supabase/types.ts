@@ -221,6 +221,7 @@ export type Database = {
           id: string
           message: string | null
           song_title: string
+          status: string | null
           user_name: string
         }
         Insert: {
@@ -229,6 +230,7 @@ export type Database = {
           id?: string
           message?: string | null
           song_title: string
+          status?: string | null
           user_name: string
         }
         Update: {
@@ -237,6 +239,7 @@ export type Database = {
           id?: string
           message?: string | null
           song_title?: string
+          status?: string | null
           user_name?: string
         }
         Relationships: []

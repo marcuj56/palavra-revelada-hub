@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { Trash2, Edit, Save, Plus, Eye, EyeOff } from "lucide-react";
+import { Trash2, Edit, Save, Plus, Eye, EyeOff, Music, CheckCircle, Clock, X } from "lucide-react";
 
 interface RadioSchedule {
   id: string;
@@ -78,9 +78,44 @@ const Admin = () => {
   const [comments, setComments] = useState([]);
   const [prayers, setPrayers] = useState([]);
   const [polls, setPolls] = useState([]);
+  const [songRequests, setSongRequests] = useState([]);
 
   useEffect(() => {
     loadAllData();
+    
+    // Set up real-time subscriptions
+    const songRequestsChannel = supabase
+      .channel('song-requests-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'song_requests' }, (payload) => {
+        setSongRequests(prev => [payload.new as any, ...prev]);
+        toast({ title: "Novo pedido de louvor recebido!" });
+      })
+      .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'song_requests' }, () => {
+        loadSongRequests();
+      })
+      .subscribe();
+
+    const prayerChannel = supabase
+      .channel('prayer-requests-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'prayer_requests' }, (payload) => {
+        setPrayers(prev => [payload.new as any, ...prev]);
+        toast({ title: "Novo pedido de oração recebido!" });
+      })
+      .subscribe();
+
+    const commentsChannel = supabase
+      .channel('comments-changes')
+      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'radio_comments' }, (payload) => {
+        setComments(prev => [payload.new as any, ...prev]);
+        toast({ title: "Novo comentário recebido!" });
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(songRequestsChannel);
+      supabase.removeChannel(prayerChannel);
+      supabase.removeChannel(commentsChannel);
+    };
   }, []);
 
   const loadAllData = async () => {
@@ -90,7 +125,8 @@ const Admin = () => {
       loadThemes(),
       loadComments(),
       loadPrayers(),
-      loadPolls()
+      loadPolls(),
+      loadSongRequests()
     ]);
   };
 
@@ -169,6 +205,19 @@ const Admin = () => {
       toast({ title: "Erro ao carregar sondagens", variant: "destructive" });
     } else {
       setPolls(data || []);
+    }
+  };
+
+  const loadSongRequests = async () => {
+    const { data, error } = await supabase
+      .from('song_requests')
+      .select('*')
+      .order('created_at', { ascending: false });
+    
+    if (error) {
+      toast({ title: "Erro ao carregar pedidos de louvor", variant: "destructive" });
+    } else {
+      setSongRequests(data || []);
     }
   };
 
@@ -302,6 +351,21 @@ const Admin = () => {
     }
   };
 
+  // Funções para pedidos de louvor
+  const updateSongRequestStatus = async (id: string, status: string) => {
+    const { error } = await supabase
+      .from('song_requests')
+      .update({ status })
+      .eq('id', id);
+
+    if (error) {
+      toast({ title: "Erro ao atualizar status", variant: "destructive" });
+    } else {
+      toast({ title: `Pedido ${status === 'completed' ? 'tocado' : status === 'rejected' ? 'rejeitado' : 'aceito'}!` });
+      loadSongRequests();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto">
@@ -311,10 +375,11 @@ const Admin = () => {
         </div>
 
         <Tabs defaultValue="schedule" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-6">
+          <TabsList className="grid w-full grid-cols-7">
             <TabsTrigger value="schedule">Programação</TabsTrigger>
             <TabsTrigger value="sermons">Esboços</TabsTrigger>
             <TabsTrigger value="themes">Temas</TabsTrigger>
+            <TabsTrigger value="songs">Pedidos</TabsTrigger>
             <TabsTrigger value="comments">Comentários</TabsTrigger>
             <TabsTrigger value="prayers">Orações</TabsTrigger>
             <TabsTrigger value="polls">Sondagens</TabsTrigger>
@@ -604,6 +669,95 @@ const Admin = () => {
                       </div>
                     </div>
                   ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Pedidos de Louvor */}
+          <TabsContent value="songs" className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Music className="h-5 w-5" />
+                  Pedidos de Louvor
+                </CardTitle>
+                <CardDescription>Gerencie os pedidos de música dos ouvintes em tempo real</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-4">
+                  {songRequests.map((request: any) => (
+                    <div key={request.id} className="border rounded-lg p-4">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold">{request.user_name}</h4>
+                            <Badge 
+                              variant={
+                                request.status === 'completed' ? 'default' : 
+                                request.status === 'approved' ? 'secondary' : 
+                                request.status === 'rejected' ? 'destructive' : 
+                                'outline'
+                              }
+                            >
+                              {request.status === 'pending' && <Clock className="h-3 w-3 mr-1" />}
+                              {request.status === 'approved' && <CheckCircle className="h-3 w-3 mr-1" />}
+                              {request.status === 'completed' && <Music className="h-3 w-3 mr-1" />}
+                              {request.status === 'rejected' && <X className="h-3 w-3 mr-1" />}
+                              {request.status === 'pending' ? 'Pendente' : 
+                               request.status === 'approved' ? 'Aprovado' :
+                               request.status === 'completed' ? 'Tocado' : 'Rejeitado'}
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground mb-1">
+                            {new Date(request.created_at).toLocaleString()}
+                          </p>
+                          <div className="mb-2">
+                            <p className="font-medium">{request.song_title}</p>
+                            {request.artist && <p className="text-sm text-muted-foreground">por {request.artist}</p>}
+                          </div>
+                          {request.message && (
+                            <p className="text-sm bg-muted p-2 rounded mt-2">{request.message}</p>
+                          )}
+                        </div>
+                        {request.status === 'pending' && (
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateSongRequestStatus(request.id, 'approved')}
+                            >
+                              <CheckCircle className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updateSongRequestStatus(request.id, 'rejected')}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                        {request.status === 'approved' && (
+                          <Button
+                            variant="default"
+                            size="sm"
+                            onClick={() => updateSongRequestStatus(request.id, 'completed')}
+                          >
+                            <Music className="h-4 w-4 mr-1" />
+                            Marcar como Tocado
+                          </Button>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                  {songRequests.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Music className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                      <p>Nenhum pedido de louvor ainda.</p>
+                      <p className="text-sm">Os pedidos aparecerão aqui em tempo real.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
