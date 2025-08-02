@@ -3,10 +3,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Download, Eye, Clock, Users } from "lucide-react";
 
 const EsbocosPregacao = () => {
   const [esbocos, setEsbocos] = useState([]);
+  const [selectedEsboco, setSelectedEsboco] = useState(null);
 
   useEffect(() => {
     const loadSermons = async () => {
@@ -159,10 +161,38 @@ const EsbocosPregacao = () => {
               </div>
 
               <div className="flex gap-2 pt-2">
-                <Button size="sm" className="flex-1">
-                  <Eye className="w-4 h-4 mr-1" />
-                  Ver Completo
-                </Button>
+                <Dialog>
+                  <DialogTrigger asChild>
+                    <Button size="sm" className="flex-1" onClick={() => setSelectedEsboco(esboço)}>
+                      <Eye className="w-4 h-4 mr-1" />
+                      Ver Completo
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                    <DialogHeader>
+                      <DialogTitle>{selectedEsboco?.title || selectedEsboco?.titulo}</DialogTitle>
+                      <DialogDescription>
+                        Tema: {selectedEsboco?.theme || selectedEsboco?.tema} | 
+                        Versículo: {selectedEsboco?.main_verse || selectedEsboco?.versiculo}
+                      </DialogDescription>
+                    </DialogHeader>
+                    <div className="space-y-4">
+                      {selectedEsboco?.content ? (
+                        <div className="prose max-w-none">
+                          <div className="whitespace-pre-wrap">{selectedEsboco.content}</div>
+                        </div>
+                      ) : (
+                        <div className="space-y-3">
+                          {selectedEsboco?.pontos?.map((ponto, idx) => (
+                            <div key={idx} className="p-3 bg-muted rounded-lg">
+                              <p className="font-medium">{ponto}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </DialogContent>
+                </Dialog>
                 <Button size="sm" variant="outline">
                   <Download className="w-4 h-4 mr-1" />
                   PDF

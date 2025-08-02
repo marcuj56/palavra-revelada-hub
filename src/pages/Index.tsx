@@ -62,11 +62,11 @@ const Index = () => {
           <Button 
             variant="outline" 
             size="sm"
-            onClick={() => navigate('/auth')}
+            onClick={() => navigate('/admin-login')}
             className="flex items-center gap-2"
           >
-            <LogIn className="w-4 h-4" />
-            Entrar
+            <Settings className="w-4 h-4" />
+            Área Admin
           </Button>
         )}
       </div>

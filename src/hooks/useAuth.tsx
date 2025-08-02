@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
               .select('*')
               .eq('user_id', session.user.id)
               .eq('is_active', true)
-              .single();
+              .maybeSingle();
             
             setIsAdmin(!!data);
           }, 0);

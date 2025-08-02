@@ -98,87 +98,104 @@ const BibliaAudio = () => {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
   const handlePlayPause = async () => {
-    if (!audioRef.current) {
-      try {
-        // Usar Text-to-Speech para narrar o capítulo
+    try {
+      if (isPlaying) {
+        // Parar reprodução
+        speechSynthesis.cancel();
+        setIsPlaying(false);
+        setCurrentTime(0);
+      } else {
+        // Iniciar reprodução
         const chapterText = await getChapterText(currentBook, currentChapter, idiomaAtual);
         if (chapterText) {
-          const audioUrl = await generateAudio(chapterText, idiomaAtual);
-          audioRef.current = new Audio(audioUrl);
-        } else {
-          // Fallback para áudio de exemplo
-          audioRef.current = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav");
+          await generateAudio(chapterText, idiomaAtual);
+          // Simular duração baseada no texto
+          setDuration(Math.ceil(chapterText.length / 10)); // ~10 caracteres por segundo
+          
+          // Simular progresso
+          const progressInterval = setInterval(() => {
+            setCurrentTime(prev => {
+              const next = prev + 1;
+              if (next >= Math.ceil(chapterText.length / 10)) {
+                clearInterval(progressInterval);
+                setIsPlaying(false);
+                setCurrentTime(0);
+                return 0;
+              }
+              return next;
+            });
+          }, 1000);
         }
-        
-        audioRef.current.addEventListener('loadedmetadata', () => {
-          setDuration(audioRef.current?.duration || 0);
-        });
-        audioRef.current.addEventListener('timeupdate', () => {
-          setCurrentTime(audioRef.current?.currentTime || 0);
-        });
-        audioRef.current.addEventListener('ended', () => {
-          setIsPlaying(false);
-        });
-      } catch (error) {
-        console.error("Erro ao carregar áudio:", error);
-        // Fallback para áudio de exemplo
-        audioRef.current = new Audio("https://www.soundjay.com/misc/sounds/bell-ringing-05.wav");
       }
+    } catch (error) {
+      console.error("Erro no player de áudio:", error);
+      setIsPlaying(false);
     }
-    
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      try {
-        await audioRef.current.play();
-      } catch (error) {
-        console.error("Erro ao reproduzir áudio:", error);
-      }
-    }
-    setIsPlaying(!isPlaying);
   };
 
   const getChapterText = async (book: string, chapter: number, language: string) => {
     try {
-      // Usar uma API de Bíblia real para obter o texto
-      const apiKey = 'YOUR_BIBLE_API_KEY'; // Substitua por uma chave real
-      const response = await fetch(`https://api.scripture.api.bible/v1/bibles/de4e12af7f28f599-02/chapters/${book}.${chapter}`, {
-        headers: {
-          'api-key': apiKey
-        }
-      });
+      // Usar API da Bíblia em Português
+      const response = await fetch(`https://bible-api.com/${book}%20${chapter}?translation=almeida`);
       
       if (!response.ok) {
         throw new Error('Falha ao carregar capítulo');
       }
       
       const data = await response.json();
-      return data.data?.content || null;
+      if (data.verses && data.verses.length > 0) {
+        return data.verses.map((verse: any) => `${verse.verse}. ${verse.text}`).join(' ');
+      }
+      return null;
     } catch (error) {
       console.error("Erro ao buscar texto bíblico:", error);
-      return `Este é o capítulo ${chapter} do livro de ${book}. O áudio real será implementado com uma API de Bíblia apropriada.`;
+      // Texto de exemplo baseado no livro e capítulo
+      const exemploTextos = {
+        'João 3': 'Porque Deus amou o mundo de tal maneira que deu o seu Filho unigênito, para que todo aquele que nele crê não pereça, mas tenha a vida eterna.',
+        'Salmos 23': 'O Senhor é o meu pastor; nada me faltará. Deitar-me faz em verdes pastos, guia-me mansamente a águas tranquilas.',
+        'Gênesis 1': 'No princípio criou Deus os céus e a terra. E a terra era sem forma e vazia; e havia trevas sobre a face do abismo.',
+      };
+      return exemploTextos[`${book} ${chapter}`] || `Capítulo ${chapter} do livro de ${book}. Aqui estaria o texto bíblico completo sendo narrado em áudio.`;
     }
   };
 
   const generateAudio = async (text: string, language: string) => {
     try {
-      // Usar Web Speech API para gerar áudio
       if ('speechSynthesis' in window) {
-        const utterance = new SpeechSynthesisUtterance(text);
-        utterance.lang = language === 'português' ? 'pt-BR' : 'en-US';
-        utterance.rate = 0.8;
-        utterance.pitch = 1;
-        
-        // Criar um blob de áudio (simulado)
-        const audioBlob = new Blob(['audio data'], { type: 'audio/wav' });
-        return URL.createObjectURL(audioBlob);
+        return new Promise((resolve) => {
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.lang = language === 'português' ? 'pt-BR' : language === 'english' ? 'en-US' : 'pt-BR';
+          utterance.rate = 0.7;
+          utterance.pitch = 1;
+          utterance.volume = 1;
+          
+          // Configurar eventos
+          utterance.onstart = () => {
+            setIsPlaying(true);
+          };
+          
+          utterance.onend = () => {
+            setIsPlaying(false);
+            setCurrentTime(0);
+          };
+          
+          utterance.onerror = () => {
+            setIsPlaying(false);
+            console.error("Erro na síntese de voz");
+          };
+          
+          // Iniciar reprodução
+          speechSynthesis.speak(utterance);
+          
+          // Para simular controle de áudio, criar um mock URL
+          resolve("mock-audio-url");
+        });
       }
       
-      // Fallback
-      return "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
+      return "mock-audio-url";
     } catch (error) {
       console.error("Erro ao gerar áudio:", error);
-      return "https://www.soundjay.com/misc/sounds/bell-ringing-05.wav";
+      return "mock-audio-url";
     }
   };
   const handleBookChange = (bookName: string) => {
