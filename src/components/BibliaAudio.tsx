@@ -214,33 +214,51 @@ const BibliaAudio = () => {
             }
           };
           
-          const utterance = new SpeechSynthesisUtterance(text);
-          utterance.lang = language === 'português' ? 'pt-BR' : language === 'english' ? 'en-US' : 'pt-BR';
-          utterance.rate = 1.2; // Velocidade melhorada
-          utterance.pitch = 1.1;
-          utterance.volume = 1;
+          // Efeito sonoro de início
+          const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+          const oscillator = audioContext.createOscillator();
+          const gainNode = audioContext.createGain();
           
-          // Configurar eventos
-          utterance.onstart = () => {
-            setIsPlaying(true);
-          };
+          oscillator.connect(gainNode);
+          gainNode.connect(audioContext.destination);
           
-          utterance.onend = () => {
-            setIsPlaying(false);
-            setCurrentTime(0);
-          };
+          oscillator.frequency.setValueAtTime(600, audioContext.currentTime);
+          oscillator.frequency.exponentialRampToValueAtTime(300, audioContext.currentTime + 0.5);
+          gainNode.gain.setValueAtTime(0.15, audioContext.currentTime);
+          gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
           
-          utterance.onerror = () => {
-            setIsPlaying(false);
-            console.error("Erro na síntese de voz");
-          };
+          oscillator.start();
+          oscillator.stop(audioContext.currentTime + 0.5);
           
-          // Iniciar reprodução
-          speechSynthesis.speak(utterance);
-          
-          // Para simular controle de áudio, criar um mock URL
-          resolve("mock-audio-url");
-        });
+           setTimeout(() => {
+             const utterance = new SpeechSynthesisUtterance(text);
+             utterance.lang = language === 'português' ? 'pt-BR' : language === 'english' ? 'en-US' : 'pt-BR';
+             utterance.rate = 1.0; // Velocidade normal
+             utterance.pitch = 1.0; // Tom normal
+             utterance.volume = 0.9;
+           
+             // Configurar eventos
+             utterance.onstart = () => {
+               setIsPlaying(true);
+             };
+             
+             utterance.onend = () => {
+               setIsPlaying(false);
+               setCurrentTime(0);
+             };
+             
+             utterance.onerror = () => {
+               setIsPlaying(false);
+               console.error("Erro na síntese de voz");
+             };
+             
+             // Iniciar reprodução
+             speechSynthesis.speak(utterance);
+             
+             // Para simular controle de áudio, criar um mock URL
+             resolve("mock-audio-url");
+           }, 600);
+         });
       }
       
       return "mock-audio-url";
@@ -296,7 +314,7 @@ const BibliaAudio = () => {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Volume2 className="w-5 h-5" />
-            Player de Áudio
+            Bíblia Fiel
           </CardTitle>
           <CardDescription>
             Reproduzindo: {currentBook} {currentChapter} em {idiomaAtualInfo?.nome}
