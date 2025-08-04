@@ -255,6 +255,20 @@ const Admin = () => {
     }
   };
 
+  const updateSchedule = async (id: string, updates: any) => {
+    const { error } = await supabase
+      .from('radio_schedule')
+      .update(updates)
+      .eq('id', id);
+    
+    if (error) {
+      toast({ title: "Erro ao atualizar programação", variant: "destructive" });
+    } else {
+      toast({ title: "Programação atualizada com sucesso!" });
+      loadSchedules();
+    }
+  };
+
   // Funções para esboços de pregação
   const saveSermon = async () => {
     if (!newSermon.title || !newSermon.theme || !newSermon.main_verse) {
@@ -440,26 +454,74 @@ const Admin = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Programação Atual</CardTitle>
+                <CardTitle>Programação Atual - Edição em Tempo Real</CardTitle>
+                <CardDescription>Edite diretamente na página da rádio</CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2">
+                <div className="space-y-4">
                   {schedules.map((schedule) => (
-                    <div key={schedule.id} className="flex items-center justify-between p-4 border rounded-lg">
-                      <div>
-                        <h4 className="font-semibold">{schedule.program_name}</h4>
-                        <p className="text-sm text-muted-foreground">{schedule.time_slot} - {schedule.presenter}</p>
-                        {schedule.description && <p className="text-sm">{schedule.description}</p>}
+                    <div key={schedule.id} className="p-4 border rounded-lg">
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Horário</label>
+                          <Input 
+                            value={schedule.time_slot} 
+                            onChange={(e) => updateSchedule(schedule.id, { time_slot: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Programa</label>
+                          <Input 
+                            value={schedule.program_name} 
+                            onChange={(e) => updateSchedule(schedule.id, { program_name: e.target.value })}
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium mb-1">Apresentador</label>
+                          <Input 
+                            value={schedule.presenter} 
+                            onChange={(e) => updateSchedule(schedule.id, { presenter: e.target.value })}
+                          />
+                        </div>
                       </div>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => deleteSchedule(schedule.id)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      <div className="mt-4">
+                        <label className="block text-sm font-medium mb-1">Descrição</label>
+                        <Textarea 
+                          value={schedule.description || ''} 
+                          onChange={(e) => updateSchedule(schedule.id, { description: e.target.value })}
+                        />
+                      </div>
+                      <div className="mt-4 flex items-center gap-4">
+                        <div className="flex items-center space-x-2">
+                          <input
+                            type="checkbox"
+                            id={`active-${schedule.id}`}
+                            checked={schedule.is_active}
+                            onChange={(e) => updateSchedule(schedule.id, { is_active: e.target.checked })}
+                          />
+                          <label htmlFor={`active-${schedule.id}`} className="text-sm">
+                            Ativo
+                          </label>
+                        </div>
+                        <div className="flex gap-2 ml-auto">
+                          <Button 
+                            variant="destructive" 
+                            size="sm"
+                            onClick={() => deleteSchedule(schedule.id)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            Excluir
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   ))}
+                  {schedules.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>Nenhuma programação cadastrada ainda.</p>
+                      <p className="text-sm">Use o formulário acima para adicionar programas.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>

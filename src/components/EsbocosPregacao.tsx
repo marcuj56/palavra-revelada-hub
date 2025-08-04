@@ -193,15 +193,79 @@ const EsbocosPregacao = () => {
                     </div>
                   </DialogContent>
                 </Dialog>
-                <Button size="sm" variant="outline">
-                  <Download className="w-4 h-4 mr-1" />
-                  PDF
+                <Button size="sm" variant="outline" asChild>
+                  <a href="https://faculdadeteologica.com.br" target="_blank" rel="noopener noreferrer">
+                    <Download className="w-4 h-4 mr-1" />
+                    Teologia BR
+                  </a>
                 </Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Sistema de Estudo Teológico Brasileiro */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Recursos de Estudo Teológico</CardTitle>
+          <CardDescription>
+            Links para instituições brasileiras de teologia e materiais de estudo
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://faculdadeteologica.com.br" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Faculdade Teológica</div>
+                  <div className="text-sm text-muted-foreground">Cursos de teologia online</div>
+                </div>
+              </a>
+            </Button>
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://seminary.org.br" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Seminário Brasileiro</div>
+                  <div className="text-sm text-muted-foreground">Formação pastoral</div>
+                </div>
+              </a>
+            </Button>
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://teologiabiblica.com" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Teologia Bíblica</div>
+                  <div className="text-sm text-muted-foreground">Estudos exegéticos</div>
+                </div>
+              </a>
+            </Button>
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://pregacaoexpositiva.com.br" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Pregação Expositiva</div>
+                  <div className="text-sm text-muted-foreground">Técnicas de homilética</div>
+                </div>
+              </a>
+            </Button>
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://bibliologia.org" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Bibliologia</div>
+                  <div className="text-sm text-muted-foreground">Estudo das Escrituras</div>
+                </div>
+              </a>
+            </Button>
+            <Button variant="outline" className="justify-start h-auto p-4" asChild>
+              <a href="https://hermeneutica.net" target="_blank" rel="noopener noreferrer">
+                <div className="text-left">
+                  <div className="font-semibold">Hermenêutica</div>
+                  <div className="text-sm text-muted-foreground">Interpretação bíblica</div>
+                </div>
+              </a>
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </section>
   );
 };

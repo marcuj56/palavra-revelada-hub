@@ -8,6 +8,8 @@ import LiveComments from "./LiveComments";
 import LivePolls from "./LivePolls";
 import PrayerRequests from "./PrayerRequests";
 import SongRequests from "./SongRequests";
+import WeatherPortugal from "./WeatherPortugal";
+import ChristianNews from "./ChristianNews";
 const RadioGospel = () => {
   const [currentStation, setCurrentStation] = useState("Rádio Vivendo Na Fé");
   const [isPlaying, setIsPlaying] = useState(false);
@@ -287,6 +289,12 @@ const RadioGospel = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <PrayerRequests />
         <SongRequests />
+      </div>
+
+      {/* Clima de Portugal e Notícias Cristãs */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <WeatherPortugal />
+        <ChristianNews />
       </div>
 
       {/* Player Integrado */}

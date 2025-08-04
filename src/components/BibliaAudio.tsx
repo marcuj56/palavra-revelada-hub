@@ -159,14 +159,65 @@ const BibliaAudio = () => {
     }
   };
 
-  const generateAudio = async (text: string, language: string) => {
+      const generateAudio = async (text: string, language: string) => {
     try {
       if ('speechSynthesis' in window) {
         return new Promise((resolve) => {
+          // Dividir texto por versículos para adicionar efeitos sonoros
+          const verses = text.split(/\d+\./);
+          let currentIndex = 0;
+          
+          const playNextVerse = () => {
+            if (currentIndex >= verses.length) {
+              setIsPlaying(false);
+              setCurrentTime(0);
+              resolve("audio-complete");
+              return;
+            }
+            
+            const verseText = verses[currentIndex].trim();
+            if (verseText) {
+              // Efeito sonoro suave antes de cada versículo
+              const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+              const oscillator = audioContext.createOscillator();
+              const gainNode = audioContext.createGain();
+              
+              oscillator.connect(gainNode);
+              gainNode.connect(audioContext.destination);
+              
+              oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+              oscillator.frequency.exponentialRampToValueAtTime(400, audioContext.currentTime + 0.3);
+              gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+              gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.3);
+              
+              oscillator.start();
+              oscillator.stop(audioContext.currentTime + 0.3);
+              
+              // Aguardar efeito sonoro antes de falar
+              setTimeout(() => {
+                const utterance = new SpeechSynthesisUtterance(verseText);
+                utterance.lang = language === 'português' ? 'pt-BR' : language === 'english' ? 'en-US' : 'pt-BR';
+                utterance.rate = 1.2; // Velocidade mais rápida
+                utterance.pitch = 1.1;
+                utterance.volume = 1;
+                
+                utterance.onend = () => {
+                  currentIndex++;
+                  setTimeout(playNextVerse, 500); // Pausa entre versículos
+                };
+                
+                speechSynthesis.speak(utterance);
+              }, 400);
+            } else {
+              currentIndex++;
+              playNextVerse();
+            }
+          };
+          
           const utterance = new SpeechSynthesisUtterance(text);
           utterance.lang = language === 'português' ? 'pt-BR' : language === 'english' ? 'en-US' : 'pt-BR';
-          utterance.rate = 0.7;
-          utterance.pitch = 1;
+          utterance.rate = 1.2; // Velocidade melhorada
+          utterance.pitch = 1.1;
           utterance.volume = 1;
           
           // Configurar eventos
