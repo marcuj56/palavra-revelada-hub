@@ -70,12 +70,10 @@ const RadioGospel = () => {
   // Carregar programação real da base de dados
   useEffect(() => {
     const loadProgramacao = async () => {
-      const { data, error } = await supabase
-        .from('radio_schedule')
-        .select('*')
-        .eq('is_active', true)
-        .order('time_slot');
-      
+      const {
+        data,
+        error
+      } = await supabase.from('radio_schedule').select('*').eq('is_active', true).order('time_slot');
       if (data && !error) {
         setProgramacao(data.map(item => ({
           horario: item.time_slot,
@@ -84,7 +82,6 @@ const RadioGospel = () => {
         })));
       }
     };
-    
     loadProgramacao();
   }, []);
 
@@ -299,31 +296,8 @@ const RadioGospel = () => {
 
       {/* Player Integrado */}
       <Card className="bg-gradient-to-br from-white via-purple-50 to-blue-50">
-        <CardHeader className="bg-green-600">
-          <CardTitle className="text-zinc-100">Player Integrado - Rádio Vivendo Na Fé</CardTitle>
-          <CardDescription className="text-zinc-50">
-            Stream direto de Portugal • Fundada por Mário Bernardo
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="aspect-video w-full bg-gradient-to-br from-radio-primary/10 to-radio-accent/10 rounded-lg flex items-center justify-center border-2 border-radio-primary/20">
-            <div className="text-center space-y-4 bg-transparent">
-              <Radio className="w-16 h-16 mx-auto text-radio-primary animate-pulse" />
-              <div>
-                <p className="text-lg font-semibold text-radio-primary">
-                  {isPlaying ? "Transmitindo ao Vivo" : "Player Integrado"}
-                </p>
-                <p className="text-sm text-muted-foreground">
-                  Rádio Vivendo Na Fé • Portugal
-                </p>
-              </div>
-              {isPlaying && <Badge className="bg-live-green text-white">
-                  <div className="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                  AO VIVO
-                </Badge>}
-            </div>
-          </div>
-        </CardContent>
+        
+        
       </Card>
     </section>;
 };
