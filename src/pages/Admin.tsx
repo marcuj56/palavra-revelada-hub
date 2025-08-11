@@ -79,11 +79,27 @@ const Admin = () => {
   const [prayers, setPrayers] = useState([]);
   const [polls, setPolls] = useState([]);
   const [songRequests, setSongRequests] = useState([]);
+  
+  // Estados para sondagens
+  const [newPoll, setNewPoll] = useState({
+    question: "",
+    options: ["", ""],
+    is_active: false
+  });
+  const [editingPoll, setEditingPoll] = useState<any>(null);
+  
+  // Estados de loading
+  const [loadingStates, setLoadingStates] = useState({
+    schedule: false,
+    sermon: false,
+    theme: false,
+    poll: false
+  });
 
   useEffect(() => {
     loadAllData();
     
-    // Set up real-time subscriptions
+    // Set up comprehensive real-time subscriptions
     const songRequestsChannel = supabase
       .channel('song-requests-changes')
       .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'song_requests' }, (payload) => {
@@ -111,10 +127,42 @@ const Admin = () => {
       })
       .subscribe();
 
+    const pollsChannel = supabase
+      .channel('polls-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'polls' }, () => {
+        loadPolls();
+      })
+      .subscribe();
+
+    const schedulesChannel = supabase
+      .channel('schedules-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'radio_schedule' }, () => {
+        loadSchedules();
+      })
+      .subscribe();
+
+    const sermonsChannel = supabase
+      .channel('sermons-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sermon_outlines' }, () => {
+        loadSermons();
+      })
+      .subscribe();
+
+    const themesChannel = supabase
+      .channel('themes-changes')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'study_themes' }, () => {
+        loadThemes();
+      })
+      .subscribe();
+
     return () => {
       supabase.removeChannel(songRequestsChannel);
       supabase.removeChannel(prayerChannel);
       supabase.removeChannel(commentsChannel);
+      supabase.removeChannel(pollsChannel);
+      supabase.removeChannel(schedulesChannel);
+      supabase.removeChannel(sermonsChannel);
+      supabase.removeChannel(themesChannel);
     };
   }, []);
 
@@ -228,16 +276,20 @@ const Admin = () => {
       return;
     }
 
+    setLoadingStates(prev => ({ ...prev, schedule: true }));
+    
     const { error } = await supabase
       .from('radio_schedule')
       .insert([newSchedule]);
 
+    setLoadingStates(prev => ({ ...prev, schedule: false }));
+
     if (error) {
-      toast({ title: "Erro ao salvar programação", variant: "destructive" });
+      console.error("Erro ao salvar programação:", error);
+      toast({ title: "Erro ao salvar programação", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Programação salva com sucesso!" });
+      toast({ title: "✅ Programação salva com sucesso!", description: "A programação aparecerá na página da rádio em tempo real" });
       setNewSchedule({ time_slot: "", program_name: "", presenter: "", description: "" });
-      loadSchedules();
     }
   };
 
@@ -276,16 +328,20 @@ const Admin = () => {
       return;
     }
 
+    setLoadingStates(prev => ({ ...prev, sermon: true }));
+
     const { error } = await supabase
       .from('sermon_outlines')
       .insert([{ ...newSermon, author: "Mário Bernardo" }]);
 
+    setLoadingStates(prev => ({ ...prev, sermon: false }));
+
     if (error) {
-      toast({ title: "Erro ao salvar esboço", variant: "destructive" });
+      console.error("Erro ao salvar esboço:", error);
+      toast({ title: "Erro ao salvar esboço", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Esboço salvo com sucesso!" });
+      toast({ title: "✅ Esboço salvo com sucesso!", description: "Publique para aparecer na página principal" });
       setNewSermon({ title: "", theme: "", main_verse: "", content: "", author: "" });
-      loadSermons();
     }
   };
 
@@ -324,16 +380,20 @@ const Admin = () => {
       return;
     }
 
+    setLoadingStates(prev => ({ ...prev, theme: true }));
+
     const { error } = await supabase
       .from('study_themes')
       .insert([newTheme]);
 
+    setLoadingStates(prev => ({ ...prev, theme: false }));
+
     if (error) {
-      toast({ title: "Erro ao salvar tema", variant: "destructive" });
+      console.error("Erro ao salvar tema:", error);
+      toast({ title: "Erro ao salvar tema", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Tema salvo com sucesso!" });
+      toast({ title: "✅ Tema salvo com sucesso!", description: "Publique para aparecer na página principal" });
       setNewTheme({ title: "", description: "", bible_references: "", content: "", difficulty_level: "Iniciante" });
-      loadThemes();
     }
   };
 
@@ -373,11 +433,90 @@ const Admin = () => {
       .eq('id', id);
 
     if (error) {
-      toast({ title: "Erro ao atualizar status", variant: "destructive" });
+      console.error("Erro ao atualizar status:", error);
+      toast({ title: "Erro ao atualizar status", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: `Pedido ${status === 'completed' ? 'tocado' : status === 'rejected' ? 'rejeitado' : 'aceito'}!` });
-      loadSongRequests();
+      toast({ title: `✅ Pedido ${status === 'completed' ? 'tocado' : status === 'rejected' ? 'rejeitado' : 'aceito'}!` });
     }
+  };
+
+  // Funções para sondagens
+  const savePoll = async () => {
+    if (!newPoll.question || newPoll.options.some(opt => !opt.trim())) {
+      toast({ title: "Preencha a pergunta e todas as opções", variant: "destructive" });
+      return;
+    }
+
+    setLoadingStates(prev => ({ ...prev, poll: true }));
+
+    const { error } = await supabase
+      .from('polls')
+      .insert([{
+        question: newPoll.question,
+        options: newPoll.options.filter(opt => opt.trim()),
+        is_active: newPoll.is_active
+      }]);
+
+    setLoadingStates(prev => ({ ...prev, poll: false }));
+
+    if (error) {
+      console.error("Erro ao criar sondagem:", error);
+      toast({ title: "Erro ao criar sondagem", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Sondagem criada com sucesso!", description: newPoll.is_active ? "Publicada imediatamente" : "Salva como rascunho" });
+      setNewPoll({ question: "", options: ["", ""], is_active: false });
+    }
+  };
+
+  const updatePoll = async (id: string, updates: any) => {
+    const { error } = await supabase
+      .from('polls')
+      .update(updates)
+      .eq('id', id);
+
+    if (error) {
+      console.error("Erro ao atualizar sondagem:", error);
+      toast({ title: "Erro ao atualizar sondagem", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Sondagem atualizada!" });
+      setEditingPoll(null);
+    }
+  };
+
+  const deletePoll = async (id: string) => {
+    const { error } = await supabase
+      .from('polls')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      console.error("Erro ao excluir sondagem:", error);
+      toast({ title: "Erro ao excluir sondagem", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "✅ Sondagem excluída!" });
+    }
+  };
+
+  const addPollOption = () => {
+    if (newPoll.options.length < 6) {
+      setNewPoll(prev => ({ ...prev, options: [...prev.options, ""] }));
+    }
+  };
+
+  const removePollOption = (index: number) => {
+    if (newPoll.options.length > 2) {
+      setNewPoll(prev => ({ 
+        ...prev, 
+        options: prev.options.filter((_, i) => i !== index) 
+      }));
+    }
+  };
+
+  const updatePollOption = (index: number, value: string) => {
+    setNewPoll(prev => ({
+      ...prev,
+      options: prev.options.map((opt, i) => i === index ? value : opt)
+    }));
   };
 
   return (
@@ -445,9 +584,9 @@ const Admin = () => {
                     />
                   </div>
                 </div>
-                <Button onClick={saveSchedule} className="w-full">
+                <Button onClick={saveSchedule} className="w-full" disabled={loadingStates.schedule}>
                   <Save className="mr-2 h-4 w-4" />
-                  Salvar Programação
+                  {loadingStates.schedule ? "Salvando..." : "Salvar Programação"}
                 </Button>
               </CardContent>
             </Card>
@@ -574,9 +713,9 @@ const Admin = () => {
                     />
                   </div>
                 </div>
-                <Button onClick={saveSermon} className="w-full">
+                <Button onClick={saveSermon} className="w-full" disabled={loadingStates.sermon}>
                   <Save className="mr-2 h-4 w-4" />
-                  Salvar Esboço
+                  {loadingStates.sermon ? "Salvando..." : "Salvar Esboço"}
                 </Button>
               </CardContent>
             </Card>
@@ -685,9 +824,9 @@ const Admin = () => {
                     />
                   </div>
                 </div>
-                <Button onClick={saveTheme} className="w-full">
+                <Button onClick={saveTheme} className="w-full" disabled={loadingStates.theme}>
                   <Save className="mr-2 h-4 w-4" />
-                  Salvar Tema
+                  {loadingStates.theme ? "Salvando..." : "Salvar Tema"}
                 </Button>
               </CardContent>
             </Card>
@@ -883,34 +1022,191 @@ const Admin = () => {
           </TabsContent>
 
           {/* Sondagens */}
-          <TabsContent value="polls">
+          <TabsContent value="polls" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Sondagens Ativas</CardTitle>
-                <CardDescription>Gerencie as sondagens do programa</CardDescription>
+                <CardTitle>Nova Sondagem</CardTitle>
+                <CardDescription>Crie novas sondagens para interagir com os ouvintes</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div>
+                  <Label htmlFor="poll_question">Pergunta da Sondagem *</Label>
+                  <Input
+                    id="poll_question"
+                    placeholder="Ex: Qual seu louvor favorito?"
+                    value={newPoll.question}
+                    onChange={(e) => setNewPoll({ ...newPoll, question: e.target.value })}
+                  />
+                </div>
+                
+                <div>
+                  <Label>Opções de Resposta *</Label>
+                  <div className="space-y-2">
+                    {newPoll.options.map((option, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          placeholder={`Opção ${index + 1}`}
+                          value={option}
+                          onChange={(e) => updatePollOption(index, e.target.value)}
+                        />
+                        {newPoll.options.length > 2 && (
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => removePollOption(index)}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                    {newPoll.options.length < 6 && (
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addPollOption}
+                        className="w-full"
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Adicionar Opção
+                      </Button>
+                    )}
+                  </div>
+                </div>
+
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="poll_active"
+                    checked={newPoll.is_active}
+                    onChange={(e) => setNewPoll({ ...newPoll, is_active: e.target.checked })}
+                  />
+                  <Label htmlFor="poll_active">Publicar imediatamente</Label>
+                </div>
+
+                <Button onClick={savePoll} className="w-full" disabled={loadingStates.poll}>
+                  <Save className="mr-2 h-4 w-4" />
+                  {loadingStates.poll ? "Criando..." : "Criar Sondagem"}
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Sondagens Existentes</CardTitle>
+                <CardDescription>Gerencie e edite suas sondagens em tempo real</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {polls.map((poll: any) => (
                     <div key={poll.id} className="border rounded-lg p-4">
                       <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="font-semibold">{poll.question}</h4>
-                          <p className="text-sm text-muted-foreground mb-2">
-                            {new Date(poll.created_at).toLocaleString()}
-                          </p>
-                          <div className="flex gap-2">
-                            {poll.options?.map((option: string, index: number) => (
-                              <Badge key={index} variant="outline">{option}</Badge>
-                            ))}
-                          </div>
-                          <Badge variant={poll.is_active ? "default" : "secondary"} className="mt-2">
-                            {poll.is_active ? "Ativa" : "Inativa"}
-                          </Badge>
+                        <div className="flex-1">
+                          {editingPoll?.id === poll.id ? (
+                            <div className="space-y-3">
+                              <Input
+                                value={editingPoll.question}
+                                onChange={(e) => setEditingPoll({ ...editingPoll, question: e.target.value })}
+                                placeholder="Pergunta da sondagem"
+                              />
+                              <div className="space-y-2">
+                                {editingPoll.options.map((option: string, index: number) => (
+                                  <Input
+                                    key={index}
+                                    value={option}
+                                    onChange={(e) => {
+                                      const newOptions = [...editingPoll.options];
+                                      newOptions[index] = e.target.value;
+                                      setEditingPoll({ ...editingPoll, options: newOptions });
+                                    }}
+                                    placeholder={`Opção ${index + 1}`}
+                                  />
+                                ))}
+                              </div>
+                              <div className="flex items-center space-x-2">
+                                <input
+                                  type="checkbox"
+                                  id={`edit-active-${poll.id}`}
+                                  checked={editingPoll.is_active}
+                                  onChange={(e) => setEditingPoll({ ...editingPoll, is_active: e.target.checked })}
+                                />
+                                <Label htmlFor={`edit-active-${poll.id}`}>Ativa</Label>
+                              </div>
+                              <div className="flex gap-2">
+                                <Button
+                                  size="sm"
+                                  onClick={() => updatePoll(poll.id, {
+                                    question: editingPoll.question,
+                                    options: editingPoll.options,
+                                    is_active: editingPoll.is_active
+                                  })}
+                                >
+                                  <Save className="h-4 w-4 mr-1" />
+                                  Salvar
+                                </Button>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setEditingPoll(null)}
+                                >
+                                  Cancelar
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div>
+                              <div className="flex items-center gap-2 mb-2">
+                                <h4 className="font-semibold">{poll.question}</h4>
+                                <Badge variant={poll.is_active ? "default" : "secondary"}>
+                                  {poll.is_active ? "Ativa" : "Inativa"}
+                                </Badge>
+                              </div>
+                              <p className="text-sm text-muted-foreground mb-2">
+                                Criada em: {new Date(poll.created_at).toLocaleString()}
+                              </p>
+                              <div className="flex flex-wrap gap-1 mb-2">
+                                {poll.options?.map((option: string, index: number) => (
+                                  <Badge key={index} variant="outline">{option}</Badge>
+                                ))}
+                              </div>
+                            </div>
+                          )}
                         </div>
+                        
+                        {editingPoll?.id !== poll.id && (
+                          <div className="flex gap-2 ml-4">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setEditingPoll(poll)}
+                            >
+                              <Edit className="h-4 w-4" />
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => updatePoll(poll.id, { is_active: !poll.is_active })}
+                            >
+                              {poll.is_active ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                            </Button>
+                            <Button
+                              variant="destructive"
+                              size="sm"
+                              onClick={() => deletePoll(poll.id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
                       </div>
                     </div>
                   ))}
+                  {polls.length === 0 && (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <p>Nenhuma sondagem criada ainda.</p>
+                      <p className="text-sm">Use o formulário acima para criar sua primeira sondagem.</p>
+                    </div>
+                  )}
                 </div>
               </CardContent>
             </Card>
