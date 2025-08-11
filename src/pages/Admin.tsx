@@ -449,23 +449,48 @@ const Admin = () => {
 
     setLoadingStates(prev => ({ ...prev, poll: true }));
 
-    const { error } = await supabase
-      .from('polls')
-      .insert([{
-        question: newPoll.question,
-        options: newPoll.options.filter(opt => opt.trim()),
-        is_active: newPoll.is_active
-      }]);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({ title: "Erro de autenticação", description: "Faça login para continuar", variant: "destructive" });
+        setLoadingStates(prev => ({ ...prev, poll: false }));
+        return;
+      }
+
+      const { error } = await supabase
+        .from('polls')
+        .insert([{
+          question: newPoll.question,
+          options: newPoll.options.filter(opt => opt.trim()),
+          is_active: newPoll.is_active
+        }]);
+
+      if (error) {
+        console.error("Erro ao criar sondagem:", error);
+        toast({ 
+          title: "Erro ao criar sondagem", 
+          description: error.message,
+          variant: "destructive" 
+        });
+      } else {
+        toast({ 
+          title: "✅ Sondagem criada com sucesso!", 
+          description: newPoll.is_active ? "Publicada imediatamente na rádio" : "Salva como rascunho" 
+        });
+        setNewPoll({ question: "", options: ["", ""], is_active: false });
+        loadPolls(); // Recarregar lista de sondagens
+      }
+    } catch (error) {
+      console.error("Erro inesperado:", error);
+      toast({ 
+        title: "Erro inesperado", 
+        description: "Tente novamente em alguns segundos",
+        variant: "destructive" 
+      });
+    }
 
     setLoadingStates(prev => ({ ...prev, poll: false }));
-
-    if (error) {
-      console.error("Erro ao criar sondagem:", error);
-      toast({ title: "Erro ao criar sondagem", description: error.message, variant: "destructive" });
-    } else {
-      toast({ title: "✅ Sondagem criada com sucesso!", description: newPoll.is_active ? "Publicada imediatamente" : "Salva como rascunho" });
-      setNewPoll({ question: "", options: ["", ""], is_active: false });
-    }
   };
 
   const updatePoll = async (id: string, updates: any) => {
