@@ -5,7 +5,7 @@ const Header = () => {
       <div className="container mx-auto px-4 py-8 text-center bg-indigo-50">
         <div className="flex justify-center items-center gap-3 mb-4">
           <Cross className="w-8 h-8" />
-          <h1 className="text-4xl font-bold">Palavra Revelada</h1>
+          <h1 className="text-4xl font-bold">Vivendo na Fé</h1>
           <Cross className="w-8 h-8" />
         </div>
         <p className="text-xl opacity-90">
