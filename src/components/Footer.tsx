@@ -1,7 +1,7 @@
 import { Heart, Mail, Phone, MapPin, Facebook, Instagram, Youtube } from "lucide-react";
 import { Button } from "@/components/ui/button";
 const Footer = () => {
-  return <footer className="bg-gradient-to-r from-foreground to-primary text-primary-foreground mt-16 bg-green-500">
+  return <footer className="bg-gradient-to-r from-foreground to-primary text-primary-foreground mt-16 rounded-sm bg-green-700">
       <div className="container mx-auto px-4 py-12 bg-green-600">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Sobre */}
