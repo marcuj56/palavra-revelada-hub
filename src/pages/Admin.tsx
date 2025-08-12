@@ -93,7 +93,10 @@ const Admin = () => {
     schedule: false,
     sermon: false,
     theme: false,
-    poll: false
+    poll: false,
+    comment: false,
+    prayer: false,
+    song: false,
   });
 
   useEffect(() => {
@@ -294,6 +297,8 @@ const Admin = () => {
   };
 
   const deleteSchedule = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir esta programação?')) return;
+    
     setLoadingStates(prev => ({ ...prev, schedule: true }));
     
     const { error } = await supabase
@@ -308,7 +313,8 @@ const Admin = () => {
       toast({ title: "Erro ao excluir programação", description: error.message, variant: "destructive" });
     } else {
       toast({ title: "✅ Programação excluída com sucesso!" });
-      // A lista será atualizada automaticamente pelo real-time subscription
+      // Remove from local state immediately for instant feedback
+      setSchedules(prev => prev.filter(s => s.id !== id));
     }
   };
 
@@ -328,16 +334,16 @@ const Admin = () => {
 
   // Funções para esboços de pregação
   const saveSermon = async () => {
-    if (!newSermon.title || !newSermon.theme || !newSermon.main_verse) {
-      toast({ title: "Preencha todos os campos obrigatórios", variant: "destructive" });
+    if (!newSermon.title.trim() || !newSermon.theme.trim()) {
+      toast({ title: "Preencha pelo menos o título e tema", variant: "destructive" });
       return;
     }
 
     setLoadingStates(prev => ({ ...prev, sermon: true }));
-
+    
     const { error } = await supabase
       .from('sermon_outlines')
-      .insert([{ ...newSermon, author: "Mário Bernardo" }]);
+      .insert([newSermon]);
 
     setLoadingStates(prev => ({ ...prev, sermon: false }));
 
@@ -345,36 +351,49 @@ const Admin = () => {
       console.error("Erro ao salvar esboço:", error);
       toast({ title: "Erro ao salvar esboço", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "✅ Esboço salvo com sucesso!", description: "Publique para aparecer na página principal" });
-      setNewSermon({ title: "", theme: "", main_verse: "", content: "", author: "" });
+      toast({ title: "✅ Esboço salvo com sucesso!" });
+      setNewSermon({ title: '', theme: '', main_verse: '', content: '', author: '' });
     }
   };
 
-  const publishSermon = async (id: string, currentStatus: boolean) => {
+  const publishSermon = async (id: string, isPublished: boolean) => {
+    setLoadingStates(prev => ({ ...prev, sermon: true }));
+    
     const { error } = await supabase
       .from('sermon_outlines')
-      .update({ is_published: !currentStatus })
+      .update({ is_published: !isPublished })
       .eq('id', id);
 
+    setLoadingStates(prev => ({ ...prev, sermon: false }));
+
     if (error) {
-      toast({ title: "Erro ao atualizar esboço", variant: "destructive" });
+      console.error("Erro ao atualizar status:", error);
+      toast({ title: "Erro ao atualizar status", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: `Esboço ${!currentStatus ? 'publicado' : 'despublicado'} com sucesso!` });
-      loadSermons();
+      toast({ title: `✅ Esboço ${!isPublished ? 'publicado' : 'despublicado'} com sucesso!` });
+      // Update local state immediately
+      setSermons(prev => prev.map(s => s.id === id ? { ...s, is_published: !isPublished } : s));
     }
   };
 
   const deleteSermon = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este esboço?')) return;
+    
+    setLoadingStates(prev => ({ ...prev, sermon: true }));
+    
     const { error } = await supabase
       .from('sermon_outlines')
       .delete()
       .eq('id', id);
 
+    setLoadingStates(prev => ({ ...prev, sermon: false }));
+
     if (error) {
-      toast({ title: "Erro ao excluir esboço", variant: "destructive" });
+      console.error("Erro ao excluir esboço:", error);
+      toast({ title: "Erro ao excluir esboço", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Esboço excluído com sucesso!" });
-      loadSermons();
+      toast({ title: "✅ Esboço excluído com sucesso!" });
+      setSermons(prev => prev.filter(s => s.id !== id));
     }
   };
 
@@ -417,16 +436,23 @@ const Admin = () => {
   };
 
   const deleteTheme = async (id: string) => {
+    if (!confirm('Tem certeza que deseja excluir este tema?')) return;
+    
+    setLoadingStates(prev => ({ ...prev, theme: true }));
+    
     const { error } = await supabase
       .from('study_themes')
       .delete()
       .eq('id', id);
 
+    setLoadingStates(prev => ({ ...prev, theme: false }));
+
     if (error) {
-      toast({ title: "Erro ao excluir tema", variant: "destructive" });
+      console.error("Erro ao excluir tema:", error);
+      toast({ title: "Erro ao excluir tema", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Tema excluído com sucesso!" });
-      loadThemes();
+      toast({ title: "✅ Tema excluído com sucesso!" });
+      setThemes(prev => prev.filter(t => t.id !== id));
     }
   };
 
