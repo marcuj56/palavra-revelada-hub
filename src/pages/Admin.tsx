@@ -294,16 +294,21 @@ const Admin = () => {
   };
 
   const deleteSchedule = async (id: string) => {
+    setLoadingStates(prev => ({ ...prev, schedule: true }));
+    
     const { error } = await supabase
       .from('radio_schedule')
       .delete()
       .eq('id', id);
 
+    setLoadingStates(prev => ({ ...prev, schedule: false }));
+
     if (error) {
-      toast({ title: "Erro ao excluir programação", variant: "destructive" });
+      console.error("Erro ao excluir programação:", error);
+      toast({ title: "Erro ao excluir programação", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Programação excluída com sucesso!" });
-      loadSchedules();
+      toast({ title: "✅ Programação excluída com sucesso!" });
+      // A lista será atualizada automaticamente pelo real-time subscription
     }
   };
 
