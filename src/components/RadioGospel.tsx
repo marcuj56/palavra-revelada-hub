@@ -82,7 +82,20 @@ const RadioGospel = () => {
         })));
       }
     };
+    
     loadProgramacao();
+    
+    // Configurar real-time updates para programação
+    const scheduleChannel = supabase
+      .channel('radio_schedule_realtime')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'radio_schedule' }, () => {
+        loadProgramacao();
+      })
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(scheduleChannel);
+    };
   }, []);
 
   // Simulação de mudança de música
